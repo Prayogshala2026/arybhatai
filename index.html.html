@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARYABHAT AI - Math Learning & AI Assistant</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --secondary: #0d9488;
+      --accent: #f59e0b;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar / Navigation Drawer */
+    .sidebar {
+      width: 275px;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar-header {
+      background: linear-gradient(135deg, #1d4ed8, #0284c7);
+      color: #fff;
+      padding: 18px 16px;
+      text-align: center;
+      position: relative;
+    }
+
+    .logo-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--primary);
+      margin: 0 auto 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 800;
+      cursor: pointer;
+      overflow: hidden;
+      border: 3px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .logo-hint {
+      font-size: 10px;
+      opacity: 0.85;
+      margin-bottom: 6px;
+      display: block;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .sidebar-header h2 {
+      font-size: 19px;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-header p {
+      font-size: 11px;
+      opacity: 0.92;
+      margin-top: 3px;
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 10px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-item {
+      padding: 11px 14px;
+      border-radius: 10px;
+      margin-bottom: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .nav-item.active {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .sidebar-footer {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      text-align: center;
+      color: var(--muted);
+      background: #f1f5f9;
+      line-height: 1.45;
+    }
+
+    /* Main Content */
+    .main {
+      margin-left: 275px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .topbar {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 900;
+    }
+
+    .menu-btn {
+      display: none;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    select, input, button, textarea {
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      opacity: 0.92;
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .badge-star {
+      background: #fef3c7;
+      color: #b45309;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+      border: 1px solid #fde68a;
+    }
+
+    .container {
+      padding: 22px;
+      max-width: 1150px;
+      width: 100%;
+      margin: 0 auto;
+      flex: 1;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero {
+      background: linear-gradient(120deg, #eff6ff, #e0f2fe);
+      border: 1px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: 24px;
+      color: #1e3a8a;
+      margin-bottom: 6px;
+    }
+
+    .hero p {
+      color: #334155;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: var(--primary);
+    }
+
+    .card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .card-click {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .card-click:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0 14px;
+      align-items: center;
+    }
+
+    .filter-bar select, .filter-bar input {
+      min-width: 160px;
+    }
+
+    /* Drag & Drop Play Zone */
+    .dnd-board {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 14px;
+      text-align: center;
+    }
+
+    .dnd-question {
+      font-size: 23px;
+      font-weight: 700;
+      margin: 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .drop-zone {
+      min-width: 96px;
+      height: 52px;
+      border: 2px dashed var(--primary);
+      border-radius: 10px;
+      background: var(--primary-light);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+      padding: 0 14px;
+    }
+
+    .drag-options {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .drag-tile {
+      padding: 12px 22px;
+      background: #fff;
+      border: 2px solid var(--secondary);
+      color: var(--secondary);
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+
+    .drag-tile:active {
+      cursor: grabbing;
+    }
+
+    /* Race Track / Dual Head Progress & Celebration */
+    .race-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 14px;
+      position: relative;
+    }
+
+    .track {
+      background: #e2e8f0;
+      height: 22px;
+      border-radius: 20px;
+      position: relative;
+      margin: 28px 0 14px;
+      overflow: visible;
+    }
+
+    .track-fill {
+      height: 100%;
+      border-radius: 20px;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .track-head {
+      position: absolute;
+      top: -25px;
+      transform: translateX(-50%);
+      transition: left 0.4s ease;
+      white-space: nowrap;
+      background: #fff;
+      padding: 2px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .celebration-banner {
+      display: none;
+      background: linear-gradient(135deg, #fef08a, #fde047, #fed7aa);
+      border: 2px solid #f59e0b;
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      margin-top: 16px;
+      animation: popIn 0.45s ease;
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Multi-Input Solver & Geometry Diagram */
+    .solver-layout {
+      display: grid;
+      grid-template-columns: 1fr 270px;
+      gap: 18px;
+      align-items: start;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 760px) {
+      .solver-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .solver-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .field-group input, .field-group select {
+      width: 100%;
+    }
+
+    .diagram-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .diagram-box svg {
+      max-width: 100%;
+      height: 185px;
+    }
+
+    .result-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .mode-switch-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0 14px;
+    }
+
+    .mode-btn {
+      padding: 9px 15px;
+      border-radius: 9px;
+      border: 1px solid var(--primary);
+      background: #fff;
+      color: var(--primary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .about-card {
+      margin-top: 18px;
+      background: linear-gradient(135deg, #f8fafc, #eff6ff);
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .about-item {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .about-item strong {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .about-editable {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px dashed #93c5fd;
+      background: #f8fafc;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Question Paper Print Area */
+    .paper-sheet {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 26px;
+      margin-top: 16px;
+    }
+
+    .paper-header {
+      text-align: center;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .q-item {
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    /* Floating Aryabhat AI Chatbot */
+    .fab-ai {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: linear-gradient(135deg, #2563eb, #0d9488);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+      z-index: 1200;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-window {
+      position: fixed;
+      bottom: 82px;
+      right: 22px;
+      width: 365px;
+      max-width: calc(100vw - 32px);
+      height: 475px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+      display: none;
+      flex-direction: column;
+      z-index: 1200;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #1d4ed8, #0284c7);
+      color: #fff;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #f8fafc;
+    }
+
+    .msg {
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      max-width: 86%;
+      word-wrap: break-word;
+    }
+
+    .msg.bot {
+      background: #fff;
+      border: 1px solid var(--border);
+      align-self: flex-start;
+    }
+
+    .msg.user {
+      background: var(--primary);
+      color: #fff;
+      align-self: flex-end;
+    }
+
+    .chat-input-bar {
+      padding: 10px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 6px;
+      background: #fff;
+    }
+
+    .chat-input-bar input {
+      flex: 1;
+    }
+
+    /* Inline API Key Drawer Panel */
+    .api-drawer {
+      display: none;
+      background: #fff;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .app-footer {
+      text-align: center;
+      padding: 14px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: #fff;
+      margin-top: 30px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 860px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .main {
+        margin-left: 0;
+      }
+      .menu-btn {
+        display: inline-block;
+      }
+    }
+
+    @media print {
+      .sidebar, .topbar, .no-print, .fab-ai, .chat-window, .api-drawer, .app-footer {
+        display: none !important;
+      }
+      .main {
+        margin-left: 0 !important;
+      }
+      .paper-sheet {
+        border: none;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hidden Logo File Input -->
+  <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="handleLogoUpload(event)" />
+
+  <!-- Navigation Drawer -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-wrap" id="logoPreview" onclick="document.getElementById('logoInput').click()" title="Click to upload school logo">🧮</div>
+      <span class="logo-hint" onclick="document.getElementById('logoInput').click()" data-i18n="uploadLogo">Change / Upload Logo</span>
+      <h2>ARYABHAT AI</h2>
+      <p>Govt. M.E. Wing, Mirganguda (Prayogshala)</p>
+    </div>
+    <ul class="nav-list">
+      <li class="nav-item active" onclick="switchTab('dashboard', this)">🏠 <span data-i18n="navHome">Dashboard</span></li>
+      <li class="nav-item" onclick="switchTab('playmath', this)">🧩 <span data-i18n="navPlay">Play-Based Drag &amp; Drop</span></li>
+      <li class="nav-item" onclick="switchTab('singlegame', this)">🏃 <span data-i18n="navSingle">Single Player Math Race</span></li>
+      <li class="nav-item" onclick="switchTab('doublegame', this)">⚔️ <span data-i18n="navDouble">Double Player Math Duel</span></li>
+      <li class="nav-item" onclick="switchTab('qspaper', this)">📝 <span data-i18n="navPaper">Auto Question Paper</span></li>
+      <li class="nav-item" onclick="switchTab('explorer', this)">📐 <span data-i18n="navExplorer">Class 1–10 &amp; Geometry Solver</span></li>
+      <li class="nav-item" onclick="switchTab('formulas', this)">📚 <span data-i18n="navFormulas">All Math Formulas</span></li>
+      <li class="nav-item" onclick="switchTab('snapsolve', this)">📸 <span data-i18n="navSnap">Snap &amp; Solve Photo AI</span></li>
+    </ul>
+    <div class="sidebar-footer">
+      Created by <strong>Govt. M.E. Wing, Mirganguda (Prayogshala)</strong><br />
+      Guide Teacher: <strong>Kalu Charan Maharana</strong>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <div class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <strong style="font-size:16px;color:var(--primary);">ARYABHAT AI</strong>
+      </div>
+      <div class="top-actions">
+        <select id="langSelect" onchange="changeLanguage(this.value)" title="Select Language">
+          <option value="en">🌐 English</option>
+          <option value="or">🌐 ଓଡ଼ିଆ (Odia)</option>
+          <option value="hi">🌐 हिन्दी (Hindi)</option>
+        </select>
+        <button class="btn-outline" onclick="toggleApiDrawer()" data-i18n="apiKeyBtn">🔑 API Key</button>
+        <span class="badge-star">⭐ <span id="starCount">0</span></span>
+      </div>
+    </header>
+
+    <div class="container">
+
+      <!-- Inline Gemini API Key Box -->
+      <div class="api-drawer" id="apiDrawer">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
+          <div style="flex:1;min-width:220px;">
+            <strong style="font-size:13px;color:var(--primary);" data-i18n="apiDrawerTitle">🔑 Free Google Gemini API Key</strong>
+            <p style="font-size:12px;color:var(--muted);margin-top:2px;" data-i18n="apiDrawerSub">Enter your Gemini API key for live AI &amp; Photo solutions, or leave blank to use Offline Math Mode.</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <input type="password" id="apiKeyInput" placeholder="AIzaSy..." style="min-width:210px;" />
+            <button class="btn" onclick="saveApiKey()" data-i18n="btnSaveKey">Save</button>
+            <button class="btn-outline" onclick="toggleApiDrawer()" data-i18n="btnClose">Close</button>
+          </div>
+        </div>
+        <p id="apiStatusMsg" style="font-size:12px;font-weight:600;margin-top:8px;color:var(--secondary);"></p>
+      </div>
+
+      <!-- 1. DASHBOARD -->
+      <section id="dashboard" class="section active">
+        <div class="hero">
+          <h1 data-i18n="heroTitle">Welcome to ARYABHAT AI — Interactive Math Lab</h1>
+          <p data-i18n="heroSub">Created by Govt. M.E. Wing, Mirganguda (Prayogshala) • Class 1 to 10 Complete Mathematics, Geometry Multi-Solver, Games &amp; AI Tutor.</p>
+        </div>
+        <div class="grid">
+          <div class="card card-click" onclick="switchTab('playmath')">
+            <h3>🧩 <span data-i18n="navPlay">Play-Based Drag &amp; Drop</span></h3>
+            <p data-i18n="cardPlayDesc">Drag numbers, operators, and geometry answers into target boxes for Class 1–10.</p>
+          </div>
+          <div class="card card-click" onclick="switchTab('singlegame')">
+            <h3>🏃 <span data-i18n="navSingle">Single Player Math Race</span></h3>
+            <p data-i18n="cardSingleDesc">Choose Boy (👦) or Girl (👧) avatar, select Class &amp; Topic, and outrun Aryabhat Bot!</p>
+          </div>
+          <div class="card card-click" onclick="switchTab('doublegame')">
+            <h3>⚔️ <span data-i18n="navDouble">Double Player Math Duel</span></h3>
+            <p data-i18n="cardDoubleDesc">Two players compete live with head-to-head animated progress bars &amp; celebration.</p>
+          </div>
+          <div class="card card-click" onclick="switchTab('qspaper')">
+            <h3>📝 <span data-i18n="navPaper">Auto Question Paper</span></h3>
+            <p data-i18n="cardPaperDesc">Auto-generate Class 1–10 Topic-wise, Monthly, Quarterly, Half-Yearly &amp; Annual papers.</p>
+          </div>
+          <div class="card card-click" onclick="switchTab('explorer')">
+            <h3>📐 <span data-i18n="navExplorer">Class 1–10 &amp; Geometry Solver</span></h3>
+            <p data-i18n="cardExplorerDesc">Class 1–10 Syllabus Topics, Geometry Diagrams &amp; Multi-Input Calculators.</p>
+          </div>
+          <div class="card card-click" onclick="switchTab('snapsolve')">
+            <h3>📸 <span data-i18n="navSnap">Snap &amp; Solve Photo AI</span></h3>
+            <p data-i18n="cardSnapDesc">Upload or click a photo of any Class 1–10 math problem for step-by-step AI solutions.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. PLAY-BASED DRAG & DROP -->
+      <section id="playmath" class="section">
+        <div class="card">
+          <h3>🧩 <span data-i18n="navPlay">Play-Based Drag &amp; Drop Math</span></h3>
+          <div class="filter-bar">
+            <select id="dndClass" onchange="populateTopics('dndClass','dndTopic'); newDndQuestion();"></select>
+            <select id="dndTopic" onchange="newDndQuestion()"></select>
+            <button class="btn" onclick="newDndQuestion()" data-i18n="btnNextPuzzle">🔄 Next Puzzle</button>
+          </div>
+          <div class="dnd-board">
+            <p style="font-size:13px;color:var(--muted);" data-i18n="dndHint">Drag the correct tile into the dashed box (or tap a tile on mobile):</p>
+            <div class="dnd-question" id="dndPrompt"></div>
+            <div class="drag-options" id="dndOptions"></div>
+            <p id="dndFeedback" style="margin-top:14px;font-weight:700;"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. SINGLE PLAYER GAME -->
+      <section id="singlegame" class="section">
+        <div class="card">
+          <h3>🏃 <span data-i18n="navSingle">Single Player Math Race</span></h3>
+          <div class="filter-bar">
+            <input type="text" id="spName" value="Student" placeholder="Player Name" />
+            <select id="spAvatar">
+              <option value="👦">👦 Boy</option>
+              <option value="👧">👧 Girl</option>
+            </select>
+            <select id="spClass" onchange="populateTopics('spClass','spTopic')"></select>
+            <select id="spTopic"></select>
+            <select id="spNumQs" title="Number of Questions">
+              <option value="5">5 Questions</option>
+              <option value="10" selected>10 Questions</option>
+              <option value="15">15 Questions</option>
+              <option value="20">20 Questions</option>
+            </select>
+            <button class="btn" onclick="startSingleGame()" data-i18n="btnStartRace">▶ Start Race</button>
+          </div>
+
+          <div class="race-box" id="spArena" style="display:none;">
+            <div class="track">
+              <div class="track-fill" id="spFill"></div>
+              <div class="track-head" id="spHead" style="left:0%;">👦 Student (0/10)</div>
+            </div>
+            <div class="track">
+              <div class="track-fill" id="botFill" style="background:linear-gradient(90deg,#f59e0b,#ef4444);"></div>
+              <div class="track-head" id="botHead" style="left:0%;">🤖 Aryabhat Bot (0/10)</div>
+            </div>
+            <div style="text-align:center;margin-top:20px;">
+              <h2 id="spQuestion" style="margin-bottom:12px;"></h2>
+              <input type="number" step="any" id="spAnswer" placeholder="Your Answer" onkeydown="if(event.key==='Enter') checkSingleAnswer()" />
+              <button class="btn btn-secondary" onclick="checkSingleAnswer()" data-i18n="btnSubmit">Submit</button>
+              <p id="spStatus" style="margin-top:10px;font-weight:700;"></p>
+            </div>
+            <div class="celebration-banner" id="spCelebration"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. DOUBLE PLAYER DUEL -->
+      <section id="doublegame" class="section">
+        <div class="card">
+          <h3>⚔️ <span data-i18n="navDouble">Double Player Math Duel</span></h3>
+          <div class="filter-bar">
+            <input type="text" id="p1Name" value="Player 1" placeholder="Player 1 Name" />
+            <select id="p1Avatar"><option value="👦">👦 Boy</option><option value="👧">👧 Girl</option></select>
+            <input type="text" id="p2Name" value="Player 2" placeholder="Player 2 Name" />
+            <select id="p2Avatar"><option value="👧">👧 Girl</option><option value="👦">👦 Boy</option></select>
+            <select id="dpClass" onchange="populateTopics('dpClass','dpTopic')"></select>
+            <select id="dpTopic"></select>
+            <select id="dpNumQs" title="Number of Questions">
+              <option value="5">5 Questions</option>
+              <option value="10" selected>10 Questions</option>
+              <option value="15">15 Questions</option>
+              <option value="20">20 Questions</option>
+            </select>
+            <button class="btn" onclick="startDoubleGame()" data-i18n="btnStartDuel">⚔️ Start Duel</button>
+          </div>
+
+          <div class="race-box" id="dpArena" style="display:none;">
+            <div class="track">
+              <div class="track-fill" id="p1Fill"></div>
+              <div class="track-head" id="p1Head" style="left:0%;">👦 Player 1 (0/10)</div>
+            </div>
+            <div class="track">
+              <div class="track-fill" id="p2Fill" style="background:linear-gradient(90deg,#8b5cf6,#ec4899);"></div>
+              <div class="track-head" id="p2Head" style="left:0%;">👧 Player 2 (0/10)</div>
+            </div>
+            <div style="text-align:center;margin-top:20px;">
+              <h2 id="dpQuestion" style="margin-bottom:14px;"></h2>
+              <div class="grid" style="max-width:620px;margin:0 auto;">
+                <div class="card">
+                  <strong id="p1Label">Player 1</strong>
+                  <div id="p1Options" style="display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap;"></div>
+                </div>
+                <div class="card">
+                  <strong id="p2Label">Player 2</strong>
+                  <div id="p2Options" style="display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap;"></div>
+                </div>
+              </div>
+              <p id="dpStatus" style="margin-top:12px;font-weight:700;"></p>
+            </div>
+            <div class="celebration-banner" id="dpCelebration"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. AUTO QUESTION PAPER GENERATOR -->
+      <section id="qspaper" class="section">
+        <div class="card no-print">
+          <h3>📝 <span data-i18n="navPaper">Auto Question Paper Generator</span></h3>
+          <div class="solver-grid">
+            <div class="field-group">
+              <label data-i18n="lblClass">Class (1 to 10)</label>
+              <select id="qpClass" onchange="populateTopics('qpClass','qpTopic', true)"></select>
+            </div>
+            <div class="field-group">
+              <label data-i18n="lblTopic">Topic / Scope</label>
+              <select id="qpTopic"></select>
+            </div>
+            <div class="field-group">
+              <label data-i18n="lblExamPattern">Exam Pattern</label>
+              <select id="qpType">
+                <option value="Topic-Wise Test">Topic-Wise Test (10 Qs)</option>
+                <option value="Monthly Assessment">Monthly Assessment (15 Qs)</option>
+                <option value="Quarterly Exam">Quarterly Exam (20 Qs)</option>
+                <option value="Half-Yearly Exam">Half-Yearly Exam (25 Qs)</option>
+                <option value="Annual Examination">Annual Examination (30 Qs)</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn" onclick="generatePaper()" data-i18n="btnGenPaper">⚡ Generate Question Paper</button>
+            <button class="btn btn-secondary" onclick="toggleAnswerKey()" data-i18n="btnToggleKey">👁 Show/Hide Answer Key</button>
+            <button class="btn-outline" onclick="window.print()" data-i18n="btnPrint">🖨 Print / Save PDF</button>
+          </div>
+        </div>
+        <div id="paperOutput"></div>
+      </section>
+
+      <!-- 6. CLASS 1-10 & GEOMETRY MULTI-SOLVER WITH DIAGRAMS -->
+      <section id="explorer" class="section">
+        <div class="card">
+          <h3>📐 <span data-i18n="navExplorer">Class 1–10 &amp; Geometry Solver</span></h3>
+          <p style="margin-bottom:10px;" data-i18n="explorerDesc">Switch between Class 1–10 Topic Calculator and Geometry Property Solver &amp; Diagram for tailored calculators and live geometry figures.</p>
+          <div class="mode-switch-row">
+            <button type="button" class="mode-btn active" id="modeClassBtn" onclick="setExplorerMode('class')" data-i18n="modeClassBtn">📘 Class 1–10 Topic Calculator</button>
+            <button type="button" class="mode-btn" id="modeGeomBtn" onclick="setExplorerMode('geometry')" data-i18n="modeGeomBtn">📐 Geometry Property Solver &amp; Diagram</button>
+          </div>
+          <div class="filter-bar" id="classModeFilters">
+            <select id="expClass" onchange="populateTopics('expClass','expTopic'); renderTopicSolver();"></select>
+            <select id="expTopic" onchange="renderTopicSolver()"></select>
+          </div>
+          <div class="filter-bar" id="geomModeFilters" style="display:none;">
+            <select id="geomShapeSelect" onchange="renderTopicSolver()">
+              <option value="Trapezium">Trapezium</option>
+              <option value="Parallelogram">Parallelogram</option>
+              <option value="Rhombus">Rhombus</option>
+              <option value="Triangle">Triangle</option>
+              <option value="Rectangle & Square">Rectangle &amp; Square</option>
+              <option value="Circle & Semicircle">Circle &amp; Semicircle</option>
+              <option value="Angles & Polygon">Angles &amp; Polygon</option>
+              <option value="3D Solids">3D Solids (Cube/Cuboid/Cylinder/Cone/Sphere)</option>
+            </select>
+          </div>
+          <div id="solverPanel" style="border-top:1px solid var(--border);padding-top:14px;"></div>
+        </div>
+      </section>
+
+      <!-- 7. ALL MATH FORMULAS HUB -->
+      <section id="formulas" class="section">
+        <div class="card">
+          <h3>📚 <span data-i18n="navFormulas">Complete Math Formula Bank (Class 1–10)</span></h3>
+          <div class="filter-bar">
+            <select id="formStage" onchange="handleStageChange()" title="Select School Stage">
+              <option value="all" data-i18n="stageAll">All Stages (Class 1–10)</option>
+              <option value="primary" data-i18n="stagePrimary">Primary (Class 1–5)</option>
+              <option value="upper" data-i18n="stageUpper">Upper Primary (Class 6–8)</option>
+              <option value="high" data-i18n="stageHigh">High School (Class 9–10)</option>
+            </select>
+            <select id="formClass" onchange="populateTopics('formClass','formTopic', true); renderFormulas();"></select>
+            <select id="formTopic" onchange="renderFormulas()"></select>
+            <input type="text" id="formulaSearch" placeholder="🔍 Search formula..." style="flex:1;" oninput="renderFormulas()" />
+          </div>
+          <div class="grid" id="formulaGrid"></div>
+        </div>
+      </section>
+
+      <!-- 8. SNAP & SOLVE PHOTO AI -->
+      <section id="snapsolve" class="section">
+        <div class="card">
+          <h3>📸 <span data-i18n="navSnap">Snap &amp; Solve Photo AI</span></h3>
+          <p style="margin-bottom:12px;" data-i18n="snapDesc">Select Class &amp; Topic, click/upload a photo of any math problem, or type an expression for instant step-by-step AI solutions.</p>
+          <div class="filter-bar">
+            <select id="snapClass" onchange="populateTopics('snapClass','snapTopic')"></select>
+            <select id="snapTopic"></select>
+            <input type="file" id="snapInput" accept="image/*" capture="environment" onchange="previewSnap(event)" />
+          </div>
+          <div id="snapPreviewBox" style="margin:12px 0;"></div>
+          <div class="field-group" style="margin-bottom:12px;">
+            <label data-i18n="snapFallbackLbl">Optional: Type or edit math expression from the photo</label>
+            <input type="text" id="snapTextFallback" placeholder="e.g., Area of trapezium with sides 10, 14 and height 6 OR (45 * 12) / 5" style="width:100%;" />
+          </div>
+          <button class="btn" onclick="solveSnapImage()" data-i18n="btnSolvePhoto">✨ Solve Problem Step-by-Step</button>
+          <div id="snapResult" class="result-box" style="display:none;"></div>
+        </div>
+
+        <!-- About This Project Card -->
+        <div class="about-card">
+          <h3 style="color:#1e3a8a;margin-bottom:4px;">🏫 <span data-i18n="aboutTitle">About This Project</span></h3>
+          <p style="font-size:12px;color:var(--muted);" data-i18n="aboutSub">Participant name and class can be edited directly and are saved automatically.</p>
+          <div class="about-grid">
+            <div class="about-item">
+              <strong data-i18n="lblProjName">Project Name</strong>
+              <div>ARYABHAT AI</div>
+            </div>
+            <div class="about-item">
+              <strong data-i18n="lblParticipants">Name of the Participants</strong>
+              <input type="text" id="aboutParticipants" class="about-editable" value="Student Participant" oninput="saveAboutProject()" placeholder="Enter participant name(s)" />
+            </div>
+            <div class="about-item">
+              <strong data-i18n="lblAboutClass">Class</strong>
+              <input type="text" id="aboutClass" class="about-editable" value="Class 8" oninput="saveAboutProject()" placeholder="Enter class" />
+            </div>
+            <div class="about-item">
+              <strong data-i18n="lblSchoolName">School Name</strong>
+              <div>Govt. M.E. Wing, Mirganguda (Prayogshala)</div>
+            </div>
+            <div class="about-item">
+              <strong data-i18n="lblGuideTeacher">Name of the Guide Teacher</strong>
+              <div>Kalu Charan Maharana, Asst. Teacher</div>
+            </div>
+            <div class="about-item">
+              <strong data-i18n="lblLocation">Block &amp; District</strong>
+              <div>Block : Nandahandi, Dist.: Nabarangpur, Odisha</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <footer class="app-footer">
+      <strong>ARYABHAT AI</strong> • Created by <strong>Govt. M.E. Wing, Mirganguda (Prayogshala)</strong><br />
+      Guide Teacher: <strong>Kalu Charan Maharana</strong> | Contact: <strong>+91-9438266287</strong>
+    </footer>
+  </div>
+
+  <!-- Floating Aryabhat AI Chatbot -->
+  <button class="fab-ai" onclick="toggleChat()">🤖 <span data-i18n="fabLabel">Aryabhat AI</span></button>
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+      <span>🤖 <span data-i18n="chatTitle">Aryabhat AI Tutor</span></span>
+      <div>
+        <button onclick="toggleApiDrawer()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;padding:4px 8px;border-radius:6px;cursor:pointer;" title="Set Free Google Gemini API Key">🔑</button>
+        <button onclick="toggleChat()" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;margin-left:6px;">✕</button>
+      </div>
+    </div>
+    <div class="chat-body" id="chatBody">
+      <div class="msg bot" id="chatWelcomeMsg">
+        Namaste! I am <strong>Aryabhat AI</strong> from <em>Govt. M.E. Wing, Mirganguda (Prayogshala)</em>. Ask me any Class 1–10 math question, geometry formula, or expression like <code>(45 * 12) / 5</code>!
+      </div>
+    </div>
+    <div class="chat-input-bar">
+      <input type="text" id="chatInput" placeholder="Ask any math question..." onkeydown="if(event.key==='Enter') sendChat()" />
+      <button class="btn" onclick="sendChat()" data-i18n="btnSend">Send</button>
+    </div>
+  </div>
+
+  <script>
+    /* ================= 1. COMPLETE CLASS 1-10 SYLLABUS DATA ================= */
+    const syllabusByClass = {
+      1: [
+        "Counting (1 se 100)", "Numbers aur Number Names", "Even & Odd numbers",
+        "Greater than / Less than / Equal to", "Ordering numbers (Ascending/Descending)",
+        "Addition (chhote numbers)", "Subtraction (chhote numbers)", "Shapes 2D & 3D (basic)",
+        "Patterns", "Length, Weight, Capacity (basic)", "Time & Clock (basic)",
+        "Money / Currency (basic)", "Zero ki samajh"
+      ],
+      2: [
+        "Numbers up to 1000", "Place Value", "Expanded Form", "Skip Counting",
+        "Ordinal Numbers", "Addition & Subtraction (carry / borrow)",
+        "Multiplication (Tables 2 se 10)", "Division (basic)", "Fractions (half, quarter)",
+        "Money", "Time & Calendar", "Length, Weight, Capacity",
+        "Shapes aur Patterns", "Tally Marks aur Pictograph"
+      ],
+      3: [
+        "Numbers up to 9999", "Place Value & Face Value", "Expanded Form", "Number Names",
+        "Addition & Subtraction", "Multiplication & Division", "Tables (up to 10-12)",
+        "Multiples", "Fractions", "Money (Rupee-Paisa)", "Time, Clock & Calendar",
+        "Length, Weight, Volume", "Perimeter (basic)", "Shapes & Symmetry",
+        "Pictograph, Bar Graph (basic)"
+      ],
+      4: [
+        "Numbers up to 1,00,000", "Place Value, Face Value, Expanded Form", "Roman Numerals",
+        "Ordering & Comparing numbers", "Estimation & Rounding off",
+        "Four operations (Addition, Subtraction, Multiplication, Division)",
+        "Factors & Multiples", "Fractions (like / unlike)", "Decimals (introduction)",
+        "Money", "Time", "Measurement (Length, Weight, Volume)", "Perimeter & Area",
+        "Angles & Lines (basic)", "Triangles, Rectangle & Square",
+        "Symmetry & Patterns", "Data Handling (Bar Graph)"
+      ],
+      5: [
+        "Large Numbers (lakh, crore)", "Indian & International Place Value System",
+        "Four operations (bade numbers)", "BODMAS / Simplification",
+        "Prime & Composite Numbers", "Factors & Multiples", "HCF", "LCM",
+        "Fractions (operations)", "Decimals (operations)", "Percentage (introduction)",
+        "Average", "Unitary Method", "Speed, Distance & Time (basic)",
+        "Area & Perimeter", "Volume & Capacity", "Angles & Lines Explorer",
+        "Triangles, Circle", "Data Handling (Bar Graph, Pictograph)"
+      ],
+      6: [
+        "Knowing Our Numbers", "Whole Numbers",
+        "Playing with Numbers (Factors, Multiples, Prime, HCF, LCM)",
+        "Integers (introduction)", "Number Line", "Fractions", "Decimals",
+        "Basic Geometrical Ideas", "Understanding Elementary Shapes",
+        "Angles & Lines Explorer", "Circle & Semicircle", "Triangles (Sides & Angles)",
+        "Practical Geometry (Constructions)", "Symmetry", "Algebra (introduction)",
+        "Ratio & Proportion", "Percentage (introduction)", "Mensuration (Perimeter & Area)",
+        "Data Handling", "Mean (Average)"
+      ],
+      7: [
+        "Integers", "Fractions & Decimals", "Rational Numbers",
+        "Simple Equations (ax + b = c)", "Algebraic Expressions", "Exponents & Powers",
+        "Lines & Angles", "Triangles & its Properties", "Angle Sum Property",
+        "Congruence of Triangles", "Pythagoras Theorem",
+        "Comparing Quantities (Ratio, Percentage)", "Profit, Loss & Discount",
+        "Simple Interest", "Perimeter & Area", "Parallelogram, Rhombus, Trapezium",
+        "Symmetry", "Practical Geometry", "Data Handling (Mean, Median, Mode)",
+        "Probability (introduction)", "Visualising Solid Shapes"
+      ],
+      8: [
+        "Rational Numbers", "Squares & Square Roots", "Cubes & Cube Roots",
+        "Exponents & Powers", "Playing with Numbers", "Linear Equations in One Variable",
+        "Algebraic Expressions & Identities", "Factorization",
+        "Comparing Quantities (Profit, Loss, Discount)", "Simple & Compound Interest",
+        "Direct & Inverse Proportion",
+        "Understanding Quadrilaterals (Parallelogram, Rhombus, Trapezium)",
+        "Practical Geometry", "Mensuration (Area, Surface Area, Volume)",
+        "3D Mensuration (Cube, Cuboid, Cylinder)",
+        "Data Handling (Bar Graph, Pie Chart, Histogram)", "Probability",
+        "Introduction to Graphs", "Coordinate Quadrants"
+      ],
+      9: [
+        "Number Systems (Real & Irrational Numbers)", "Polynomials",
+        "Algebraic Identities & Factorization", "Coordinate Geometry",
+        "Linear Equations in Two Variables", "Introduction to Euclid’s Geometry",
+        "Lines & Angles", "Triangles (Congruence)",
+        "Quadrilaterals (Parallelogram, Rhombus, Trapezium)",
+        "Area of Parallelograms & Triangles", "Circles", "Constructions",
+        "Heron’s Formula", "Surface Areas & Volumes (Cube, Cuboid, Cylinder, Cone, Sphere)",
+        "Statistics (Mean, Median, Mode, Histogram)", "Probability"
+      ],
+      10: [
+        "Real Numbers (Euclid’s Division Lemma, HCF & LCM)",
+        "Polynomials (Zeroes of a Polynomial)",
+        "Pair of Linear Equations in Two Variables", "Quadratic Equations",
+        "Arithmetic Progression", "Triangles (Similar Triangles)",
+        "Coordinate Geometry", "Introduction to Trigonometry",
+        "Applications of Trigonometry", "Circles (Chords & Tangents)",
+        "Constructions", "Areas Related to Circles (Circle & Semicircle)",
+        "Surface Areas & Volumes (Combination of solids)",
+        "Statistics (Mean, Median, Mode)", "Probability"
+      ]
+    };
+
+    function initClassDropdowns() {
+      const classIds = ['dndClass', 'spClass', 'dpClass', 'qpClass', 'expClass', 'formClass', 'snapClass'];
+      classIds.forEach(cid => {
+        const el = document.getElementById(cid);
+        if (!el) return;
+        el.innerHTML = '';
+        for (let c = 1; c <= 10; c++) {
+          const opt = document.createElement('option');
+          opt.value = c;
+          opt.textContent = `Class ${c}`;
+          if (c === 6) opt.selected = true;
+          el.appendChild(opt);
+        }
+      });
+      populateTopics('dndClass', 'dndTopic');
+      populateTopics('spClass', 'spTopic');
+      populateTopics('dpClass', 'dpTopic');
+      populateTopics('qpClass', 'qpTopic', true);
+      populateTopics('expClass', 'expTopic');
+      populateTopics('formClass', 'formTopic', true);
+      populateTopics('snapClass', 'snapTopic');
+    }
+
+    function populateTopics(classSelectId, topicSelectId, includeAll = false) {
+      const cls = document.getElementById(classSelectId).value;
+      const tEl = document.getElementById(topicSelectId);
+      const list = syllabusByClass[cls] || [];
+      tEl.innerHTML = includeAll ? `<option value="All">All Class ${cls} Topics</option>` : '';
+      list.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        tEl.appendChild(opt);
+      });
+    }
+
+    /* ================= 2. FULL PAGE MULTILINGUAL TRANSLATION (EN / OR / HI) ================= */
+    let currentLang = 'en';
+    const i18n = {
+      en: {
+        uploadLogo: "Change / Upload Logo",
+        apiKeyBtn: "🔑 API Key",
+        apiDrawerTitle: "🔑 Free Google Gemini API Key",
+        apiDrawerSub: "Enter your Gemini API key for live AI & Photo solutions, or leave blank to use Offline Math Mode.",
+        btnSaveKey: "Save",
+        btnClose: "Close",
+        navHome: "Dashboard",
+        navPlay: "Play-Based Drag & Drop",
+        navSingle: "Single Player Math Race",
+        navDouble: "Double Player Math Duel",
+        navPaper: "Auto Question Paper",
+        navExplorer: "Class 1–10 & Geometry Solver",
+        navFormulas: "All Math Formulas",
+        navSnap: "Snap & Solve Photo AI",
+        heroTitle: "Welcome to ARYABHAT AI — Interactive Math Lab",
+        heroSub: "Created by Govt. M.E. Wing, Mirganguda (Prayogshala) • Class 1 to 10 Complete Mathematics, Geometry Multi-Solver, Games & AI Tutor.",
+        cardPlayDesc: "Drag numbers, operators, and geometry answers into target boxes for Class 1–10.",
+        cardSingleDesc: "Choose Boy (👦) or Girl (👧) avatar, select Class & Topic, and outrun Aryabhat Bot!",
+        cardDoubleDesc: "Two players compete live with head-to-head animated progress bars & celebration.",
+        cardPaperDesc: "Auto-generate Class 1–10 Topic-wise, Monthly, Quarterly, Half-Yearly & Annual papers.",
+        cardExplorerDesc: "Class 1–10 Syllabus Topics, Geometry Diagrams & Multi-Input Calculators.",
+        cardSnapDesc: "Upload or click a photo of any Class 1–10 math problem for step-by-step AI solutions.",
+        btnNextPuzzle: "🔄 Next Puzzle",
+        dndHint: "Drag the correct tile into the dashed box (or tap a tile on mobile):",
+        btnStartRace: "▶ Start Race",
+        btnSubmit: "Submit",
+        btnStartDuel: "⚔️ Start Duel",
+        lblClass: "Class (1 to 10)",
+        lblTopic: "Topic / Scope",
+        lblExamPattern: "Exam Pattern",
+        btnGenPaper: "⚡ Generate Question Paper",
+        btnToggleKey: "👁 Show/Hide Answer Key",
+        btnPrint: "🖨 Print / Save PDF",
+        explorerDesc: "Switch between Class 1–10 Topic Calculator and Geometry Property Solver & Diagram for tailored calculators and live geometry figures.",
+        modeClassBtn: "📘 Class 1–10 Topic Calculator",
+        modeGeomBtn: "📐 Geometry Property Solver & Diagram",
+        stageAll: "All Stages (Class 1–10)",
+        stagePrimary: "Primary (Class 1–5)",
+        stageUpper: "Upper Primary (Class 6–8)",
+        stageHigh: "High School (Class 9–10)",
+        snapDesc: "Select Class & Topic, click/upload a photo of any math problem, or type an expression for instant step-by-step AI solutions.",
+        snapFallbackLbl: "Optional: Type or edit math expression from the photo",
+        btnSolvePhoto: "✨ Solve Problem Step-by-Step",
+        aboutTitle: "About This Project",
+        aboutSub: "Participant name and class can be edited directly and are saved automatically.",
+        lblProjName: "Project Name",
+        lblParticipants: "Name of the Participants",
+        lblAboutClass: "Class",
+        lblSchoolName: "School Name",
+        lblGuideTeacher: "Name of the Guide Teacher",
+        lblLocation: "Block & District",
+        fabLabel: "Aryabhat AI",
+        chatTitle: "Aryabhat AI Tutor",
+        btnSend: "Send",
+        chatInputPh: "Ask any math question...",
+        formulaSearchPh: "🔍 Search formula..."
+      },
+      or: {
+        uploadLogo: "ଲୋଗୋ ପରିବର୍ତ୍ତନ କରନ୍ତୁ",
+        apiKeyBtn: "🔑 API କି",
+        apiDrawerTitle: "🔑 ମାଗଣା ଗୁଗୁଲ୍ ଜେମିନି API କି",
+        apiDrawerSub: "ଲାଇଭ୍ AI ଓ ଫଟୋ ସମାଧାନ ପାଇଁ API କି ଦିଅନ୍ତୁ, ନଚେତ୍ ଅଫଲାଇନ୍ ଗଣିତ ମୋଡ୍ ବ୍ୟବହାର କରନ୍ତୁ।",
+        btnSaveKey: "ସେଭ୍ କରନ୍ତୁ",
+        btnClose: "ବନ୍ଦ କରନ୍ତୁ",
+        navHome: "ଡ୍ୟାସବୋର୍ଡ",
+        navPlay: "ଡ୍ରାଗ୍ ଏବଂ ଡ୍ରପ୍ ଗଣିତ ଖେଳ",
+        navSingle: "ଏକକ ଖେଳାଳି ଗଣିତ ଦୌଡ଼",
+        navDouble: "ଦୁଇ ଖେଳାଳି ଗଣିତ ପ୍ରତିଯୋଗିତା",
+        navPaper: "ସ୍ୱୟଂଚାଳିତ ପ୍ରଶ୍ନପତ୍ର",
+        navExplorer: "ଶ୍ରେଣୀ ୧–୧୦ ଏବଂ ଜ୍ୟାମିତି ସମାଧାନ",
+        navFormulas: "ସମସ୍ତ ଗଣିତ ସୂତ୍ର",
+        navSnap: "ଫଟୋ ଉଠାଇ ସମାଧାନ କରନ୍ତୁ",
+        heroTitle: "ARYABHAT AI କୁ ସ୍ୱାଗତ — ଗଣିତ ପ୍ରୟୋଗଶାଳା",
+        heroSub: "ପ୍ରସ୍ତୁତକର୍ତ୍ତା: Govt. M.E. Wing, Mirganguda (Prayogshala) • ଶ୍ରେଣୀ ୧ ରୁ ୧୦ ସମ୍ପୂର୍ଣ୍ଣ ଗଣିତ ଏବଂ ଜ୍ୟାମିତି।",
+        cardPlayDesc: "ଶ୍ରେଣୀ ୧–୧୦ ପାଇଁ ସଠିକ୍ ଉତ୍ତରକୁ ବାକ୍ସ ଭିତରକୁ ଡ୍ରାଗ୍ ଏବଂ ଡ୍ରପ୍ କରନ୍ତୁ।",
+        cardSingleDesc: "ବାଳକ (👦) କିମ୍ବା ବାଳିକା (👧) ବାଛନ୍ତୁ ଏବଂ ଆର୍ଯ୍ୟଭଟ୍ଟ ବଟ୍ ସହିତ ଦୌଡ଼ନ୍ତୁ!",
+        cardDoubleDesc: "ଦୁଇ ଖେଳାଳିଙ୍କ ମଧ୍ୟରେ ସିଧାସଳଖ ଗଣିତ ପ୍ରତିଯୋଗିତା ଏବଂ ବିଜୟ ଉତ୍ସବ।",
+        cardPaperDesc: "ଶ୍ରେଣୀ ୧–୧୦ ପାଇଁ ମାସିକ, ତ୍ରୈମାସିକ, ଅର୍ଦ୍ଧବାର୍ଷିକ ଏବଂ ବାର୍ଷିକ ପ୍ରଶ୍ନପତ୍ର ତିଆରି କରନ୍ତୁ।",
+        cardExplorerDesc: "ଶ୍ରେଣୀ ୧–୧୦ ପାଠ୍ୟକ୍ରମ, ଜ୍ୟାମିତି ଚିତ୍ର ଏବଂ ମଲ୍ଟି-ଇନପୁଟ୍ କାଲକୁଲେଟର।",
+        cardSnapDesc: "ଗଣିତ ପ୍ରଶ୍ନର ଫଟୋ ଉଠାଇ କିମ୍ବା ଅପଲୋଡ୍ କରି ତୁରନ୍ତ ସମାଧାନ ପାଆନ୍ତୁ।",
+        btnNextPuzzle: "🔄 ପରବର୍ତ୍ତୀ ପ୍ରଶ୍ନ",
+        dndHint: "ସଠିକ୍ ଟାଇଲ୍ କୁ ବାକ୍ସ ଭିତରକୁ ଡ୍ରାଗ୍ କରନ୍ତୁ (କିମ୍ବା ଟାପ୍ କରନ୍ତୁ):",
+        btnStartRace: "▶ ଦୌଡ଼ ଆରମ୍ଭ କରନ୍ତୁ",
+        btnSubmit: "ଉତ୍ତର ଦିଅନ୍ତୁ",
+        btnStartDuel: "⚔️ ପ୍ରତିଯୋଗିତା ଆରମ୍ଭ",
+        lblClass: "ଶ୍ରେଣୀ (୧ ରୁ ୧୦)",
+        lblTopic: "ବିଷୟ (Topic)",
+        lblExamPattern: "ପରୀକ୍ଷା ପଦ୍ଧତି",
+        btnGenPaper: "⚡ ପ୍ରଶ୍ନପତ୍ର ତିଆରି କରନ୍ତୁ",
+        btnToggleKey: "👁 ଉତ୍ତର ଖାତା ଦେଖନ୍ତୁ",
+        btnPrint: "🖨 ପ୍ରିଣ୍ଟ / PDF ସେଭ୍",
+        explorerDesc: "ଶ୍ରେଣୀ ୧–୧୦ ବିଷୟ କାଲକୁଲେଟର ଏବଂ ଜ୍ୟାମିତି ଗୁଣଧର୍ମ ଓ ଚିତ୍ର ମଧ୍ୟରେ ବାଛନ୍ତୁ।",
+        modeClassBtn: "📘 ଶ୍ରେଣୀ ୧–୧୦ ବିଷୟ କାଲକୁଲେଟର",
+        modeGeomBtn: "📐 ଜ୍ୟାମିତି ଗୁଣଧର୍ମ ଓ ଚିତ୍ର",
+        stageAll: "ସମସ୍ତ ସ୍ତର (ଶ୍ରେଣୀ ୧–୧୦)",
+        stagePrimary: "ପ୍ରାଥମିକ (ଶ୍ରେଣୀ ୧–୫)",
+        stageUpper: "ଉଚ୍ଚ ପ୍ରାଥମିକ (ଶ୍ରେଣୀ ୬–୮)",
+        stageHigh: "ମାଧ୍ୟମିକ / ହାଇସ୍କୁଲ (ଶ୍ରେଣୀ ୯–୧୦)",
+        snapDesc: "ଶ୍ରେଣୀ ଓ ବିଷୟ ବାଛନ୍ତୁ ଏବଂ ଫଟୋ ଅପଲୋଡ୍ କରି ସମାଧାନ ପାଆନ୍ତୁ।",
+        snapFallbackLbl: "ବୈକଳ୍ପିକ: ଫଟୋରେ ଥିବା ଗଣିତ ପ୍ରଶ୍ନ ଏଠାରେ ଲେଖନ୍ତୁ",
+        btnSolvePhoto: "✨ ପର୍ଯ୍ୟାୟକ୍ରମେ ସମାଧାନ କରନ୍ତୁ",
+        aboutTitle: "ଏହି ପ୍ରକଳ୍ପ ବିଷୟରେ",
+        aboutSub: "ଅଂଶଗ୍ରହଣକାରୀଙ୍କ ନାମ ଓ ଶ୍ରେଣୀ ଏଠାରେ ସମ୍ପାଦନ କରିପାରିବେ।",
+        lblProjName: "ପ୍ରକଳ୍ପର ନାମ",
+        lblParticipants: "ଅଂଶଗ୍ରହଣକାରୀଙ୍କ ନାମ",
+        lblAboutClass: "ଶ୍ରେଣୀ",
+        lblSchoolName: "ବିଦ୍ୟାଳୟର ନାମ",
+        lblGuideTeacher: "ମାର୍ଗଦର୍ଶକ ଶିକ୍ଷକ",
+        lblLocation: "ବ୍ଲକ୍ ଓ ଜିଲ୍ଲା",
+        fabLabel: "ଆର୍ଯ୍ୟଭଟ୍ଟ AI",
+        chatTitle: "ଆର୍ଯ୍ୟଭଟ୍ଟ AI ଶିକ୍ଷକ",
+        btnSend: "ପଠାନ୍ତୁ",
+        chatInputPh: "ଯେକୌଣସି ଗଣିତ ପ୍ରଶ୍ନ ପଚାରନ୍ତୁ...",
+        formulaSearchPh: "🔍 ସୂତ୍ର ଖୋଜନ୍ତୁ..."
+      },
+      hi: {
+        uploadLogo: "लोगो बदलें / अपलोड करें",
+        apiKeyBtn: "🔑 API कुंजी",
+        apiDrawerTitle: "🔑 मुफ्त Google Gemini API कुंजी",
+        apiDrawerSub: "लाइव AI और फोटो हल के लिए Gemini API कुंजी डालें, या ऑफलाइन मैथ मोड का उपयोग करें।",
+        btnSaveKey: "सेव करें",
+        btnClose: "बंद करें",
+        navHome: "डैशबोर्ड",
+        navPlay: "ड्रैग एंड ड्रॉप गणित खेल",
+        navSingle: "सिंगल प्लेयर गणित दौड़",
+        navDouble: "डबल प्लेयर गणित मुकाबला",
+        navPaper: "ऑटो प्रश्न पत्र जनरेटर",
+        navExplorer: "कक्षा 1–10 और ज्यामिति सॉल्वर",
+        navFormulas: "सभी गणित सूत्र",
+        navSnap: "फोटो खींचकर हल पाएं",
+        heroTitle: "ARYABHAT AI में स्वागत है — इंटरैक्टिव गणित लैब",
+        heroSub: "निर्माता: Govt. M.E. Wing, Mirganguda (Prayogshala) • कक्षा 1 से 10 तक संपूर्ण गणित, ज्यामिति और AI शिक्षक।",
+        cardPlayDesc: "कक्षा 1–10 के लिए संख्याओं और उत्तरों को बॉक्स में ड्रैग और ड्रॉप करें।",
+        cardSingleDesc: "लड़का (👦) या लड़की (👧) अवतार चुनें, कक्षा और टॉपिक चुनें, और दौड़ जीतें!",
+        cardDoubleDesc: "दो खिलाड़ियों के बीच लाइव मुकाबला, प्रोग्रेस बार और विजेता सेलिब्रेशन।",
+        cardPaperDesc: "कक्षा 1–10 के लिए टॉपिक-वाइज, मासिक, त्रैमासिक, अर्धवार्षिक और वार्षिक पेपर बनाएं।",
+        cardExplorerDesc: "कक्षा 1–10 के सभी टॉपिक, ज्यामिति चित्र (Diagrams) और मल्टी-इनपुट सॉल्वर।",
+        cardSnapDesc: "किसी भी गणित प्रश्न की फोटो खींचकर या अपलोड करके स्टेप-बाय-स्टेप हल पाएं।",
+        btnNextPuzzle: "🔄 अगला प्रश्न",
+        dndHint: "सही टाइल को बॉक्स में ड्रैग करें (या मोबाइल पर टैप करें):",
+        btnStartRace: "▶ दौड़ शुरू करें",
+        btnSubmit: "उत्तर दें",
+        btnStartDuel: "⚔️ मुकाबला शुरू करें",
+        lblClass: "कक्षा (1 से 10)",
+        lblTopic: "टॉपिक / विषय",
+        lblExamPattern: "परीक्षा पैटर्न",
+        btnGenPaper: "⚡ प्रश्न पत्र बनाएं",
+        btnToggleKey: "👁 उत्तर कुंजी दिखाएं/छिपाएं",
+        btnPrint: "🖨 प्रिंट / PDF सेव करें",
+        explorerDesc: "कक्षा 1–10 टॉपिक कैलकुलेटर और ज्यामिति प्रॉपर्टी सॉल्वर व चित्र के बीच चुनें।",
+        modeClassBtn: "📘 कक्षा 1–10 टॉपिक कैलकुलेटर",
+        modeGeomBtn: "📐 ज्यामिति प्रॉपर्टी सॉल्वर व चित्र",
+        stageAll: "सभी स्तर (कक्षा 1–10)",
+        stagePrimary: "प्राथमिक (कक्षा 1–5)",
+        stageUpper: "उच्च प्राथमिक (कक्षा 6–8)",
+        stageHigh: "हाई स्कूल (कक्षा 9–10)",
+        snapDesc: "कक्षा और टॉपिक चुनें, फोटो अपलोड करें या प्रश्न लिखें और हल पाएं।",
+        snapFallbackLbl: "वैकल्पिक: फोटो का गणित प्रश्न यहाँ टाइप करें",
+        btnSolvePhoto: "✨ स्टेप-बाय-स्टेप हल करें",
+        aboutTitle: "इस प्रोजेक्ट के बारे में",
+        aboutSub: "प्रतिभागियों का नाम और कक्षा सीधे बदल सकते हैं और यह स्वतः सेव होता है।",
+        lblProjName: "प्रोजेक्ट का नाम",
+        lblParticipants: "प्रतिभागियों के नाम",
+        lblAboutClass: "कक्षा",
+        lblSchoolName: "विद्यालय का नाम",
+        lblGuideTeacher: "मार्गदर्शक शिक्षक",
+        lblLocation: "ब्लॉक और जिला",
+        fabLabel: "आर्यभट्ट AI",
+        chatTitle: "आर्यभट्ट AI शिक्षक",
+        btnSend: "भेजें",
+        chatInputPh: "कोई भी गणित प्रश्न पूछें...",
+        formulaSearchPh: "🔍 सूत्र खोजें..."
+      }
+    };
+
+    function changeLanguage(lang) {
+      currentLang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (i18n[lang] && i18n[lang][key]) el.innerText = i18n[lang][key];
+      });
+      if (document.getElementById('chatInput')) document.getElementById('chatInput').placeholder = i18n[lang].chatInputPh;
+      if (document.getElementById('formulaSearch')) document.getElementById('formulaSearch').placeholder = i18n[lang].formulaSearchPh;
+      renderTopicSolver();
+      renderFormulas();
+    }
+
+    /* ================= STATE, STARS & LOGO ================= */
+    let stars = 0;
+    let geminiApiKey = '';
+    try {
+      stars = Number(localStorage.getItem('aryabhat_stars') || 0);
+      geminiApiKey = localStorage.getItem('aryabhat_gemini_key') || '';
+      const savedLogo = localStorage.getItem('aryabhat_logo');
+      if (savedLogo) document.getElementById('logoPreview').innerHTML = `<img src="${savedLogo}" alt="Logo"/>`;
+      const savedPart = localStorage.getItem('aryabhat_participants');
+      const savedCls = localStorage.getItem('aryabhat_about_class');
+      if (savedPart && document.getElementById('aboutParticipants')) document.getElementById('aboutParticipants').value = savedPart;
+      if (savedCls && document.getElementById('aboutClass')) document.getElementById('aboutClass').value = savedCls;
+    } catch (_) {}
+    document.getElementById('starCount').innerText = stars;
+
+    function saveAboutProject() {
+      try {
+        localStorage.setItem('aryabhat_participants', document.getElementById('aboutParticipants').value);
+        localStorage.setItem('aryabhat_about_class', document.getElementById('aboutClass').value);
+      } catch (_) {}
+    }
+
+    function handleLogoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try { localStorage.setItem('aryabhat_logo', reader.result); } catch (_) {}
+        document.getElementById('logoPreview').innerHTML = `<img src="${reader.result}" alt="Logo"/>`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function addStars(n) {
+      stars += n;
+      try { localStorage.setItem('aryabhat_stars', stars); } catch (_) {}
+      document.getElementById('starCount').innerText = stars;
+    }
+
+    function switchTab(id, navEl) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      const targetSec = document.getElementById(id);
+      if (targetSec) targetSec.classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (navEl) {
+        navEl.classList.add('active');
+      } else {
+        const matchNav = Array.from(document.querySelectorAll('.nav-item')).find(n => (n.getAttribute('onclick') || '').includes(`'${id}'`));
+        if (matchNav) matchNav.classList.add('active');
+      }
+      document.getElementById('sidebar').classList.remove('open');
+    }
+
+    function toggleApiDrawer() {
+      const drawer = document.getElementById('apiDrawer');
+      const input = document.getElementById('apiKeyInput');
+      const status = document.getElementById('apiStatusMsg');
+      if (drawer.style.display === 'block') {
+        drawer.style.display = 'none';
+      } else {
+        drawer.style.display = 'block';
+        input.value = geminiApiKey;
+        status.innerText = geminiApiKey
+          ? '✅ Active: Free Google Gemini API Key configured.'
+          : 'ℹ️ Offline Math Mode active. Paste a Gemini API key to enable online AI.';
+      }
+    }
+
+    function saveApiKey() {
+      const input = document.getElementById('apiKeyInput');
+      const status = document.getElementById('apiStatusMsg');
+      geminiApiKey = input.value.trim();
+      try { localStorage.setItem('aryabhat_gemini_key', geminiApiKey); } catch (_) {}
+      status.innerText = geminiApiKey
+        ? '✅ Saved! Google Gemini API is now active for Chatbot & Snap Solve.'
+        : 'ℹ️ API key cleared. Switched to Offline Math Helper Mode.';
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[ch]));
+    }
+
+    /* ================= DYNAMIC QUESTION GENERATOR BY CLASS & TOPIC ================= */
+    function generateQuestionForTopic(cls, topic) {
+      const c = Number(cls);
+      const t = (topic || '').toLowerCase();
+
+      if (t.includes('trigonometry')) {
+        const bank = [
+          { q: 'Value of sin 30° + cos 60° = ?', a: 1 },
+          { q: 'Value of tan 45° × sec 0° = ?', a: 1 },
+          { q: 'If sin θ = 3/5, find 5 × cos θ = ?', a: 4 }
+        ];
+        return bank[Math.floor(Math.random() * bank.length)];
+      }
+      if (t.includes('quadratic')) {
+        const r1 = Math.floor(Math.random() * 5) + 1, r2 = Math.floor(Math.random() * 4) + 2;
+        return { q: `Sum of roots of x² − ${r1 + r2}x + ${r1 * r2} = 0 is ?`, a: r1 + r2 };
+      }
+      if (t.includes('arithmetic progression')) {
+        const a = 3, d = 4, n = 6;
+        return { q: `Find the ${n}th term of AP: 3, 7, 11, ...`, a: a + (n - 1) * d };
+      }
+      if (t.includes('heron') || t.includes('pythagoras')) {
+        return { q: 'Right triangle legs are 6 cm and 8 cm. Hypotenuse (cm) = ?', a: 10 };
+      }
+      if (t.includes('circle') || t.includes('semicircle')) {
+        return { q: 'Radius of circle is 7 cm. Circumference (π = 22/7) = ?', a: 44 };
+      }
+      if (t.includes('trapezium')) {
+        const a = 8, b = 12, h = 5;
+        return { q: `Area of trapezium with parallel sides ${a}, ${b} and height ${h} = ?`, a: 0.5 * (a + b) * h };
+      }
+      if (t.includes('parallelogram') || t.includes('rhombus') || t.includes('quadrilateral')) {
+        const b = 9, h = 6;
+        return { q: `Area of parallelogram with base ${b} cm and height ${h} cm = ?`, a: b * h };
+      }
+      if (t.includes('angle') || t.includes('triangle')) {
+        const a1 = 55, a2 = 65;
+        return { q: `In a triangle, two angles are ${a1}° and ${a2}°. Third angle (°) = ?`, a: 180 - a1 - a2 };
+      }
+      if (t.includes('square') && t.includes('root')) {
+        const n = Math.floor(Math.random() * 11) + 4;
+        return { q: `Find √(${n * n}) = ?`, a: n };
+      }
+      if (t.includes('cube') && t.includes('root')) {
+        const n = Math.floor(Math.random() * 7) + 2;
+        return { q: `Find ∛(${n * n * n}) = ?`, a: n };
+      }
+      if (t.includes('equation') || t.includes('algebra') || t.includes('polynomial')) {
+        const x = Math.floor(Math.random() * 8) + 2;
+        return { q: `Solve for x: 4x + 5 = ${4 * x + 5}`, a: x };
+      }
+      if (t.includes('interest')) {
+        return { q: 'Simple Interest on ₹1000 at 10% for 2 years = ?', a: 200 };
+      }
+      if (t.includes('percentage')) {
+        return { q: 'Find 25% of 200 = ?', a: 50 };
+      }
+      if (t.includes('hcf')) {
+        return { q: 'Find HCF of 12 and 18 = ?', a: 6 };
+      }
+      if (t.includes('lcm')) {
+        return { q: 'Find LCM of 4 and 6 = ?', a: 12 };
+      }
+      if (t.includes('even') || t.includes('odd')) {
+        const n = (Math.floor(Math.random() * 15) + 1) * 2;
+        return { q: `Next even number after ${n} is ?`, a: n + 2 };
+      }
+      if (t.includes('zero')) {
+        const n = Math.floor(Math.random() * 20) + 1;
+        return { q: `${n} + 0 = ?`, a: n };
+      }
+      if (t.includes('subtraction')) {
+        const a = (c * 10) + 15, b = c * 4 + 3;
+        return { q: `${a} − ${b} = ?`, a: a - b };
+      }
+      if (t.includes('multiplication') || t.includes('table')) {
+        const a = Math.min(12, c + 3), b = Math.floor(Math.random() * 9) + 2;
+        return { q: `${a} × ${b} = ?`, a: a * b };
+      }
+      if (t.includes('division')) {
+        const b = Math.floor(Math.random() * 8) + 2, ans = Math.floor(Math.random() * 9) + 2;
+        return { q: `${b * ans} ÷ ${b} = ?`, a: ans };
+      }
+
+      const a = (Math.floor(Math.random() * 10) + 2) * c;
+      const b = Math.floor(Math.random() * 12) + 3;
+      return { q: `${a} + ${b} = ?`, a: a + b };
+    }
+
+    /* ================= 2. DRAG & DROP MATH ================= */
+    let currentDndAns = '';
+    function newDndQuestion() {
+      const cls = document.getElementById('dndClass').value;
+      const topic = document.getElementById('dndTopic').value;
+      const item = generateQuestionForTopic(cls, topic);
+      currentDndAns = String(item.a);
+
+      const promptEl = document.getElementById('dndPrompt');
+      const optEl = document.getElementById('dndOptions');
+      document.getElementById('dndFeedback').innerText = '';
+
+      const cleanQ = item.q.replace('?', '');
+      promptEl.innerHTML = `<span>${escapeHtml(cleanQ)}</span> <div class="drop-zone" id="dropTarget" ondragover="event.preventDefault()" ondrop="handleDrop(event)">?</div>`;
+
+      const numA = Number(item.a);
+      const opts = Array.from(new Set([
+        String(numA),
+        String(numA + 2),
+        String(Math.max(0, numA - 1)),
+        String(numA + 5)
+      ])).sort(() => Math.random() - 0.5);
+
+      optEl.innerHTML = opts.map(o =>
+        `<div class="drag-tile" draggable="true" ondragstart="event.dataTransfer.setData('text/plain','${o}')" onclick="verifyDnd('${o}')">${o}</div>`
+      ).join('');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      verifyDnd(e.dataTransfer.getData('text/plain'));
+    }
+
+    function verifyDnd(val) {
+      const target = document.getElementById('dropTarget');
+      const fb = document.getElementById('dndFeedback');
+      target.innerText = val;
+      if (val === currentDndAns) {
+        target.style.borderColor = 'var(--success)';
+        target.style.color = 'var(--success)';
+        fb.style.color = 'var(--success)';
+        fb.innerText = '🎉 Correct! +5 Stars earned!';
+        addStars(5);
+      } else {
+        target.style.borderColor = 'var(--danger)';
+        target.style.color = 'var(--danger)';
+        fb.style.color = 'var(--danger)';
+        fb.innerText = '❌ Incorrect! Try dragging another tile.';
+      }
+    }
+
+    /* ================= 3. SINGLE PLAYER RACE ================= */
+    let spCorrect = 0, botCorrect = 0, spTotalQs = 10, spAns = 0, botTimer = null;
+
+    function startSingleGame() {
+      spCorrect = 0; botCorrect = 0;
+      spTotalQs = Number(document.getElementById('spNumQs').value);
+      const name = document.getElementById('spName').value || 'Student';
+      const av = document.getElementById('spAvatar').value;
+
+      document.getElementById('spCelebration').style.display = 'none';
+      document.getElementById('spHead').innerText = `${av} ${name} (0/${spTotalQs})`;
+      document.getElementById('spHead').style.left = '0%';
+      document.getElementById('spFill').style.width = '0%';
+      document.getElementById('botHead').innerText = `🤖 Aryabhat Bot (0/${spTotalQs})`;
+      document.getElementById('botHead').style.left = '0%';
+      document.getElementById('botFill').style.width = '0%';
+      document.getElementById('spStatus').innerText = '';
+      document.getElementById('spArena').style.display = 'block';
+      nextSpQuestion();
+
+      clearInterval(botTimer);
+      botTimer = setInterval(() => {
+        botCorrect++;
+        const pct = Math.min(100, (botCorrect / spTotalQs) * 100);
+        document.getElementById('botFill').style.width = pct + '%';
+        document.getElementById('botHead').style.left = pct + '%';
+        document.getElementById('botHead').innerText = `🤖 Aryabhat Bot (${botCorrect}/${spTotalQs})`;
+        if (botCorrect >= spTotalQs) {
+          clearInterval(botTimer);
+          showCelebration('spCelebration', '🤖 Aryabhat Bot', 'Bot completed the race first! Click Start Race to beat it!');
+        }
+      }, 3600);
+    }
+
+    function nextSpQuestion() {
+      const cls = document.getElementById('spClass').value;
+      const topic = document.getElementById('spTopic').value;
+      const obj = generateQuestionForTopic(cls, topic);
+      spAns = obj.a;
+      document.getElementById('spQuestion').innerText = `Q${spCorrect + 1}/${spTotalQs}: ${obj.q}`;
+      document.getElementById('spAnswer').value = '';
+      document.getElementById('spAnswer').focus();
+    }
+
+    function checkSingleAnswer() {
+      if (spCorrect >= spTotalQs || botCorrect >= spTotalQs) return;
+      const val = Number(document.getElementById('spAnswer').value);
+      const name = document.getElementById('spName').value || 'Student';
+      const av = document.getElementById('spAvatar').value;
+
+      if (Math.abs(val - spAns) < 0.01) {
+        spCorrect++;
+        const pct = Math.min(100, (spCorrect / spTotalQs) * 100);
+        document.getElementById('spFill').style.width = pct + '%';
+        document.getElementById('spHead').style.left = pct + '%';
+        document.getElementById('spHead').innerText = `${av} ${name} (${spCorrect}/${spTotalQs})`;
+        document.getElementById('spStatus').innerText = '';
+        if (spCorrect >= spTotalQs) {
+          clearInterval(botTimer);
+          addStars(spTotalQs * 2);
+          showCelebration('spCelebration', `${av} ${name}`, `Champion of ${document.getElementById('spTopic').value} (Class ${document.getElementById('spClass').value})! Earned +${spTotalQs * 2} Stars!`);
+        } else {
+          nextSpQuestion();
+        }
+      } else {
+        document.getElementById('spStatus').innerText = '⚠️ Incorrect! Try again.';
+      }
+    }
+
+    /* ================= 4. DOUBLE PLAYER DUEL ================= */
+    let p1Correct = 0, p2Correct = 0, dpTotalQs = 10, dpAns = 0;
+
+    function startDoubleGame() {
+      p1Correct = 0; p2Correct = 0;
+      dpTotalQs = Number(document.getElementById('dpNumQs').value);
+      const n1 = document.getElementById('p1Name').value || 'Player 1';
+      const a1 = document.getElementById('p1Avatar').value;
+      const n2 = document.getElementById('p2Name').value || 'Player 2';
+      const a2 = document.getElementById('p2Avatar').value;
+
+      document.getElementById('dpCelebration').style.display = 'none';
+      document.getElementById('p1Head').innerText = `${a1} ${n1} (0/${dpTotalQs})`;
+      document.getElementById('p2Head').innerText = `${a2} ${n2} (0/${dpTotalQs})`;
+      document.getElementById('p1Label').innerText = `${a1} ${n1}`;
+      document.getElementById('p2Label').innerText = `${a2} ${n2}`;
+      document.getElementById('p1Fill').style.width = '0%';
+      document.getElementById('p1Head').style.left = '0%';
+      document.getElementById('p2Fill').style.width = '0%';
+      document.getElementById('p2Head').style.left = '0%';
+      document.getElementById('dpStatus').innerText = '';
+      document.getElementById('dpArena').style.display = 'block';
+      nextDpRound();
+    }
+
+    function nextDpRound() {
+      const cls = document.getElementById('dpClass').value;
+      const topic = document.getElementById('dpTopic').value;
+      const obj = generateQuestionForTopic(cls, topic);
+      dpAns = obj.a;
+      document.getElementById('dpQuestion').innerText = obj.q;
+      const choices = Array.from(new Set([dpAns, dpAns + 3, Math.max(0, dpAns - 2), dpAns + 6])).sort(() => Math.random() - 0.5);
+      document.getElementById('p1Options').innerHTML = choices.map(c => `<button class="btn" onclick="dpHit(1,${c})">${c}</button>`).join('');
+      document.getElementById('p2Options').innerHTML = choices.map(c => `<button class="btn btn-secondary" onclick="dpHit(2,${c})">${c}</button>`).join('');
+    }
+
+    function dpHit(player, val) {
+      if (p1Correct >= dpTotalQs || p2Correct >= dpTotalQs) return;
+      const n1 = document.getElementById('p1Name').value || 'Player 1';
+      const a1 = document.getElementById('p1Avatar').value;
+      const n2 = document.getElementById('p2Name').value || 'Player 2';
+      const a2 = document.getElementById('p2Avatar').value;
+
+      if (Math.abs(val - dpAns) < 0.01) {
+        if (player === 1) {
+          p1Correct++;
+          const pct = Math.min(100, (p1Correct / dpTotalQs) * 100);
+          document.getElementById('p1Fill').style.width = pct + '%';
+          document.getElementById('p1Head').style.left = pct + '%';
+          document.getElementById('p1Head').innerText = `${a1} ${n1} (${p1Correct}/${dpTotalQs})`;
+        } else {
+          p2Correct++;
+          const pct = Math.min(100, (p2Correct / dpTotalQs) * 100);
+          document.getElementById('p2Fill').style.width = pct + '%';
+          document.getElementById('p2Head').style.left = pct + '%';
+          document.getElementById('p2Head').innerText = `${a2} ${n2} (${p2Correct}/${dpTotalQs})`;
+        }
+        if (p1Correct >= dpTotalQs || p2Correct >= dpTotalQs) {
+          const winner = p1Correct >= dpTotalQs ? `${a1} ${n1}` : `${a2} ${n2}`;
+          addStars(dpTotalQs * 3);
+          showCelebration('dpCelebration', winner, `Grand Winner of the Math Duel (${dpTotalQs} Qs)! +${dpTotalQs * 3} Stars Awarded!`);
+        } else {
+          nextDpRound();
+        }
+      }
+    }
+
+    function showCelebration(elId, winnerName, subtitle) {
+      const box = document.getElementById(elId);
+      box.style.display = 'block';
+      box.innerHTML = `
+        <div style="font-size:34px;">🎉🏆🎊🥳✨</div>
+        <h2 style="color:#b45309;margin:6px 0;">CONGRATULATIONS, ${escapeHtml(winnerName)}!</h2>
+        <p style="color:#78350f;font-weight:600;">${escapeHtml(subtitle)}</p>
+      `;
+    }
+
+    /* ================= 5. AUTO QUESTION PAPER GENERATOR ================= */
+    function generatePaper() {
+      const cls = Number(document.getElementById('qpClass').value);
+      const topic = document.getElementById('qpTopic').value;
+      const exam = document.getElementById('qpType').value;
+      const count = exam.includes('10') ? 10 : exam.includes('15') ? 15 : exam.includes('20') ? 20 : exam.includes('25') ? 25 : 30;
+      const classTopics = syllabusByClass[cls] || ['Arithmetic'];
+
+      const qs = [];
+      for (let i = 1; i <= count; i++) {
+        const chosenTopic = topic === 'All' ? classTopics[(i - 1) % classTopics.length] : topic;
+        const item = generateQuestionForTopic(cls, chosenTopic);
+        qs.push({ q: item.q, ans: item.a });
+      }
+
+      document.getElementById('paperOutput').innerHTML = `
+        <div class="paper-sheet">
+          <div class="paper-header">
+            <h2>GOVT. M.E. WING, MIRGANGUDA (PRAYOGSHALA)</h2>
+            <p><strong>${escapeHtml(exam)}</strong> • Subject: Mathematics • Class: ${cls} • Scope: ${escapeHtml(topic)}</p>
+            <p style="font-size:12px;">Guide Teacher: Kalu Charan Maharana | Total Questions: ${count} | Full Marks: ${count * 2}</p>
+          </div>
+          ${qs.map((item, idx) => `<div class="q-item"><strong>Q${idx + 1}.</strong> ${escapeHtml(item.q)}</div>`).join('')}
+          <div id="answerKeyBox" style="display:none;margin-top:20px;border-top:2px dashed #94a3b8;padding-top:12px;">
+            <h4>Answer Key:</h4>
+            ${qs.map((item, idx) => `<div class="q-item"><strong>Q${idx + 1}.</strong> ${escapeHtml(String(item.ans))}</div>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleAnswerKey() {
+      const box = document.getElementById('answerKeyBox');
+      if (!box) return;
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    /* ================= 6. CLASS 1-10 & GEOMETRY MULTI-SOLVER WITH DIAGRAMS ================= */
+    let explorerMode = 'class';
+
+    function setExplorerMode(mode) {
+      explorerMode = mode;
+      document.getElementById('modeClassBtn').classList.toggle('active', mode === 'class');
+      document.getElementById('modeGeomBtn').classList.toggle('active', mode === 'geometry');
+      document.getElementById('classModeFilters').style.display = mode === 'class' ? 'flex' : 'none';
+      document.getElementById('geomModeFilters').style.display = mode === 'geometry' ? 'flex' : 'none';
+      renderTopicSolver();
+    }
+
+    function getGeometrySVG(topicName) {
+      const t = topicName.toLowerCase();
+      if (t.includes('trapezium')) {
+        return `<svg viewBox="0 0 260 170">
+          <polygon points="65,35 195,35 235,135 25,135" fill="#dbeafe" stroke="#2563eb" stroke-width="2.5"/>
+          <line x1="65" y1="35" x2="65" y2="135" stroke="#dc2626" stroke-width="2" stroke-dasharray="4"/>
+          <text x="125" y="27" font-size="12" fill="#1e3a8a" font-weight="bold">a</text>
+          <text x="125" y="152" font-size="12" fill="#1e3a8a" font-weight="bold">b</text>
+          <text x="72" y="90" font-size="12" fill="#dc2626" font-weight="bold">h</text>
+          <text x="32" y="85" font-size="12" fill="#0f172a">c</text>
+          <text x="220" y="85" font-size="12" fill="#0f172a">d</text>
+        </svg><small>Trapezium Diagram</small>`;
+      }
+      if (t.includes('parallelogram')) {
+        return `<svg viewBox="0 0 260 170">
+          <polygon points="65,35 230,35 195,135 30,135" fill="#ccfbf1" stroke="#0d9488" stroke-width="2.5"/>
+          <line x1="65" y1="35" x2="65" y2="135" stroke="#dc2626" stroke-width="2" stroke-dasharray="4"/>
+          <text x="115" y="152" font-size="12" fill="#0f766e" font-weight="bold">Base (b)</text>
+          <text x="72" y="90" font-size="12" fill="#dc2626" font-weight="bold">h</text>
+          <text x="34" y="85" font-size="12" fill="#0f172a">Side (a)</text>
+          <text x="48" y="128" font-size="11" fill="#b45309">θ</text>
+        </svg><small>Parallelogram Diagram</small>`;
+      }
+      if (t.includes('rhombus')) {
+        return `<svg viewBox="0 0 260 170">
+          <polygon points="130,20 220,85 130,150 40,85" fill="#fef3c7" stroke="#d97706" stroke-width="2.5"/>
+          <line x1="130" y1="20" x2="130" y2="150" stroke="#2563eb" stroke-width="1.8" stroke-dasharray="4"/>
+          <line x1="40" y1="85" x2="220" y2="85" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="4"/>
+          <text x="135" y="55" font-size="12" fill="#2563eb" font-weight="bold">d₁</text>
+          <text x="170" y="80" font-size="12" fill="#dc2626" font-weight="bold">d₂</text>
+          <text x="180" y="48" font-size="12" fill="#92400e" font-weight="bold">a</text>
+        </svg><small>Rhombus Diagram</small>`;
+      }
+      if (t.includes('circle') || t.includes('semicircle')) {
+        return `<svg viewBox="0 0 260 170">
+          <circle cx="130" cy="85" r="62" fill="#e0f2fe" stroke="#0284c7" stroke-width="2.5"/>
+          <line x1="130" y1="85" x2="192" y2="85" stroke="#dc2626" stroke-width="2.2"/>
+          <circle cx="130" cy="85" r="3" fill="#0f172a"/>
+          <text x="155" y="78" font-size="13" fill="#dc2626" font-weight="bold">r</text>
+          <text x="108" y="162" font-size="11" fill="#0369a1">Diameter d = 2r</text>
+        </svg><small>Circle &amp; Semicircle</small>`;
+      }
+      if (t.includes('triangle') || t.includes('heron') || t.includes('pythagoras') || t.includes('trigonometry')) {
+        return `<svg viewBox="0 0 260 170">
+          <polygon points="45,140 215,140 45,30" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5"/>
+          <rect x="45" y="126" width="14" height="14" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+          <text x="125" y="156" font-size="12" fill="#5b21b6" font-weight="bold">Base (b)</text>
+          <text x="16" y="90" font-size="12" fill="#5b21b6" font-weight="bold">Height (a)</text>
+          <text x="135" y="80" font-size="12" fill="#dc2626" font-weight="bold">Hypotenuse (c)</text>
+        </svg><small>Triangle Geometry</small>`;
+      }
+      if (t.includes('3d') || t.includes('volume') || t.includes('solid') || t.includes('cube') || t.includes('cylinder')) {
+        return `<svg viewBox="0 0 260 170">
+          <ellipse cx="130" cy="38" rx="48" ry="15" fill="#bae6fd" stroke="#0284c7" stroke-width="2"/>
+          <path d="M82,38 L82,130 A48,15 0 0,0 178,130 L178,38" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+          <line x1="130" y1="38" x2="178" y2="38" stroke="#dc2626" stroke-width="2"/>
+          <text x="150" y="33" font-size="12" fill="#dc2626" font-weight="bold">r</text>
+          <text x="185" y="90" font-size="12" fill="#0369a1" font-weight="bold">h</text>
+        </svg><small>3D Solid Mensuration</small>`;
+      }
+      if (t.includes('angle') || t.includes('line')) {
+        return `<svg viewBox="0 0 260 170">
+          <line x1="40" y1="130" x2="220" y2="130" stroke="#2563eb" stroke-width="2.5"/>
+          <line x1="40" y1="130" x2="175" y2="40" stroke="#0d9488" stroke-width="2.5"/>
+          <path d="M85,130 A45,45 0 0,0 76,105" fill="none" stroke="#dc2626" stroke-width="2"/>
+          <text x="92" y="118" font-size="13" fill="#dc2626" font-weight="bold">θ°</text>
+        </svg><small>Angle &amp; Rays</small>`;
+      }
+      if (t.includes('coordinate') || t.includes('graph')) {
+        return `<svg viewBox="0 0 260 170">
+          <line x1="130" y1="15" x2="130" y2="155" stroke="#0f172a" stroke-width="2"/>
+          <line x1="25" y1="85" x2="235" y2="85" stroke="#0f172a" stroke-width="2"/>
+          <circle cx="175" cy="48" r="5" fill="#dc2626"/>
+          <text x="183" y="45" font-size="12" fill="#dc2626" font-weight="bold">P(x, y)</text>
+          <text x="222" y="78" font-size="11">X</text>
+          <text x="136" y="25" font-size="11">Y</text>
+        </svg><small>Cartesian Plane</small>`;
+      }
+      return `<svg viewBox="0 0 260 170">
+        <rect x="45" y="35" width="170" height="95" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5"/>
+        <line x1="45" y1="130" x2="215" y2="35" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4"/>
+        <text x="115" y="148" font-size="12" fill="#1e3a8a" font-weight="bold">Length (l)</text>
+        <text x="220" y="88" font-size="12" fill="#1e3a8a" font-weight="bold">b</text>
+        <text x="115" y="78" font-size="11" fill="#dc2626">Diagonal</text>
+      </svg><small>2D Geometric Shape</small>`;
+    }
+
+    function getSolverSpec(topicName) {
+      const t = topicName.toLowerCase();
+      if (t.includes('trapezium')) {
+        return {
+          fields: ['Parallel Side a', 'Parallel Side b', 'Height h', 'Non-parallel Side c', 'Non-parallel Side d', 'Area A'],
+          solve: (v) => {
+            let [a, b, h, c, d, A] = v;
+            c = c || h;
+            d = d || h;
+            if (!h && A && a && b) h = (2 * A) / (a + b);
+            if (!a && A && h && b) a = ((2 * A) / h) - b;
+            if (!b && A && h && a) b = ((2 * A) / h) - a;
+            if (!A && a && b && h) A = 0.5 * (a + b) * h;
+            const P = (a && b && c && d) ? (a + b + c + d).toFixed(2) : 'Enter sides c & d for exact perimeter';
+            return `<strong>Parallel Sides:</strong> a = ${a ?? '?'}, b = ${b ?? '?'}<br><strong>Height (h):</strong> ${h ? h.toFixed(2) : '?'}<br><strong>Area:</strong> ${A ? A.toFixed(2) : '?'} sq. units<br><strong>Perimeter:</strong> ${P}`;
+          }
+        };
+      }
+      if (t.includes('parallelogram')) {
+        return {
+          fields: ['Base b', 'Side a', 'Height h', 'Angle θ (°)', 'Area A'],
+          solve: (v) => {
+            let [b, a, h, th, A] = v;
+            a = a || b;
+            if (!h && A && b) h = A / b;
+            if (!b && A && h) b = A / h;
+            if (!A && b && h) A = b * h;
+            if (!A && a && b && th) A = a * b * Math.sin(th * Math.PI / 180);
+            return `<strong>Base (b):</strong> ${b ?? '?'} | <strong>Side (a):</strong> ${a ?? '?'}<br><strong>Height (h):</strong> ${h ? h.toFixed(2) : '?'}<br><strong>Area:</strong> ${A ? A.toFixed(2) : '?'}<br><strong>Perimeter:</strong> ${a && b ? (2 * (a + b)).toFixed(2) : '?'}<br><strong>Angles:</strong> ${th ? `${th}° & ${180 - th}°` : 'Enter θ for angles'}`;
+          }
+        };
+      }
+      if (t.includes('rhombus')) {
+        return {
+          fields: ['Side a', 'Diagonal d1', 'Diagonal d2', 'Area A'],
+          solve: (v) => {
+            let [a, d1, d2, A] = v;
+            if (!d2 && A && d1) d2 = (2 * A) / d1;
+            if (!d1 && A && d2) d1 = (2 * A) / d2;
+            if (!A && d1 && d2) A = 0.5 * d1 * d2;
+            if (!a && d1 && d2) a = Math.sqrt((d1 / 2) ** 2 + (d2 / 2) ** 2);
+            return `<strong>Side (a):</strong> ${a ? a.toFixed(2) : '?'}<br><strong>Diagonals:</strong> d₁ = ${d1 ?? '?'}, d₂ = ${d2 ? d2.toFixed(2) : '?'}<br><strong>Area:</strong> ${A ? A.toFixed(2) : '?'}<br><strong>Perimeter:</strong> ${a ? (4 * a).toFixed(2) : '?'}`;
+          }
+        };
+      }
+      if (t.includes('circle') || t.includes('semicircle')) {
+        return {
+          fields: ['Radius r', 'Diameter d', 'Area A', 'Circumference C'],
+          solve: (v) => {
+            let [r, d, A, C] = v;
+            if (!r && d) r = d / 2;
+            if (!r && C) r = C / (2 * Math.PI);
+            if (!r && A) r = Math.sqrt(A / Math.PI);
+            r = r || 0;
+            d = r ? 2 * r : 0;
+            A = r ? Math.PI * r * r : 0;
+            C = r ? 2 * Math.PI * r : 0;
+            return `<strong>Radius (r):</strong> ${r.toFixed(2)} | <strong>Diameter (d):</strong> ${d.toFixed(2)}<br><strong>Circle Area:</strong> ${A.toFixed(2)} | <strong>Circumference:</strong> ${C.toFixed(2)}<br><strong>Semicircle Area:</strong> ${(A / 2).toFixed(2)} | <strong>Semicircle Perimeter:</strong> ${(Math.PI * r + 2 * r).toFixed(2)}`;
+          }
+        };
+      }
+      if (t.includes('triangle') || t.includes('heron') || t.includes('pythagoras')) {
+        return {
+          fields: ['Side a / Base', 'Side b / Height', 'Side c / Hypotenuse', 'Angle A (°)', 'Angle B (°)'],
+          solve: (v) => {
+            let [a, b, c, A, B] = v;
+            if (!c && a && b && !A) c = Math.sqrt(a * a + b * b);
+            const C = (A && B) ? (180 - A - B) : null;
+            const area = (a && b && c)
+              ? (() => { const s = (a + b + c) / 2; return Math.sqrt(Math.max(0, s * (s - a) * (s - b) * (s - c))); })()
+              : (a && b ? 0.5 * a * b : null);
+            return `<strong>Area:</strong> ${area ? area.toFixed(2) : '?'}<br><strong>Perimeter:</strong> ${(a && b && c) ? (a + b + c).toFixed(2) : '?'}<br><strong>Hypotenuse / Side c:</strong> ${c ? c.toFixed(2) : '?'}<br><strong>Third Angle C:</strong> ${C !== null ? C + '°' : 'Enter Angles A & B'}`;
+          }
+        };
+      }
+      if (t.includes('angle') || t.includes('line') || t.includes('euclid')) {
+        return {
+          fields: ['Given Angle θ (°)', 'Polygon Sides n'],
+          solve: (v) => {
+            const [th, n] = v;
+            const type = th < 90 ? 'Acute Angle' : th === 90 ? 'Right Angle' : th < 180 ? 'Obtuse Angle' : th === 180 ? 'Straight Angle' : 'Reflex Angle';
+            const comp = th <= 90 ? (90 - th) + '°' : 'N/A';
+            const supp = th <= 180 ? (180 - th) + '°' : 'N/A';
+            const poly = n >= 3 ? `Interior Sum = ${(n - 2) * 180}°, Regular Angle = ${(((n - 2) * 180) / n).toFixed(2)}°` : '';
+            return (th !== null ? `<strong>Type:</strong> ${type} | <strong>Complementary:</strong> ${comp} | <strong>Supplementary:</strong> ${supp}<br>` : '') + (poly ? `<strong>Polygon (${n} sides):</strong> ${poly}` : '');
+          }
+        };
+      }
+      if (t.includes('3d') || t.includes('volume') || t.includes('solid') || t.includes('cube') || t.includes('cylinder')) {
+        return {
+          fields: ['Radius r / Side a', 'Height h / Breadth b', 'Length l (Cuboid)'],
+          solve: (v) => {
+            const r = v[0] || 4, h = v[1] || r, l = v[2] || r;
+            return `<strong>Cube (a=${r}):</strong> Vol = ${(r ** 3).toFixed(2)}, TSA = ${(6 * r * r).toFixed(2)}<br>
+                    <strong>Cuboid (${l}×${h}×${r}):</strong> Vol = ${(l * h * r).toFixed(2)}, TSA = ${(2 * (l * h + h * r + l * r)).toFixed(2)}<br>
+                    <strong>Cylinder (r=${r}, h=${h}):</strong> Vol = ${(Math.PI * r * r * h).toFixed(2)}, TSA = ${(2 * Math.PI * r * (r + h)).toFixed(2)}<br>
+                    <strong>Cone (r=${r}, h=${h}):</strong> Vol = ${((1 / 3) * Math.PI * r * r * h).toFixed(2)} | <strong>Sphere (r=${r}):</strong> Vol = ${((4 / 3) * Math.PI * (r ** 3)).toFixed(2)}`;
+          }
+        };
+      }
+      if (t.includes('trigonometry')) {
+        return {
+          fields: ['Angle θ (degrees)', 'Hypotenuse H (optional)'],
+          solve: (v) => {
+            const th = v[0] ?? 30, H = v[1] || 1;
+            const rad = th * Math.PI / 180;
+            return `<strong>Angle θ = ${th}°:</strong><br>
+                    sin(${th}°) = ${Math.sin(rad).toFixed(4)} | cos(${th}°) = ${Math.cos(rad).toFixed(4)} | tan(${th}°) = ${Math.tan(rad).toFixed(4)}<br>
+                    <strong>Opposite Side:</strong> ${(H * Math.sin(rad)).toFixed(2)} | <strong>Adjacent Side:</strong> ${(H * Math.cos(rad)).toFixed(2)}`;
+          }
+        };
+      }
+      if (t.includes('quadratic')) {
+        return {
+          fields: ['Coefficient a (x²)', 'Coefficient b (x)', 'Constant c'],
+          solve: (v) => {
+            const a = v[0] || 1, b = v[1] ?? -5, c = v[2] ?? 6;
+            const D = b * b - 4 * a * c;
+            if (D < 0) return `<strong>Discriminant D = ${D}</strong> (< 0): Complex / No Real Roots.`;
+            const r1 = (-b + Math.sqrt(D)) / (2 * a), r2 = (-b - Math.sqrt(D)) / (2 * a);
+            return `<strong>Equation:</strong> ${a}x² + (${b})x + (${c}) = 0<br><strong>Discriminant (D):</strong> ${D}<br><strong>Roots:</strong> x₁ = <strong>${r1.toFixed(3)}</strong>, x₂ = <strong>${r2.toFixed(3)}</strong>`;
+          }
+        };
+      }
+      if (t.includes('arithmetic progression')) {
+        return {
+          fields: ['First Term (a)', 'Common Difference (d)', 'Number of Terms (n)'],
+          solve: (v) => {
+            const a = v[0] ?? 2, d = v[1] ?? 3, n = v[2] || 10;
+            const nth = a + (n - 1) * d;
+            const sn = (n / 2) * (2 * a + (n - 1) * d);
+            return `<strong>nth Term (aₙ):</strong> ${nth}<br><strong>Sum of ${n} Terms (Sₙ):</strong> ${sn}`;
+          }
+        };
+      }
+      if (t.includes('interest')) {
+        return {
+          fields: ['Principal (P)', 'Rate % (R)', 'Time Years (T)'],
+          solve: (v) => {
+            const P = v[0] || 1000, R = v[1] || 8, T = v[2] || 2;
+            const si = (P * R * T) / 100;
+            const ciAmt = P * Math.pow(1 + R / 100, T);
+            return `<strong>Simple Interest:</strong> ₹${si.toFixed(2)} (Total: ₹${(P + si).toFixed(2)})<br><strong>Compound Interest:</strong> ₹${(ciAmt - P).toFixed(2)} (Total: ₹${ciAmt.toFixed(2)})`;
+          }
+        };
+      }
+      if (t.includes('coordinate') || t.includes('graph')) {
+        return {
+          fields: ['x₁', 'y₁', 'x₂', 'y₂'],
+          solve: (v) => {
+            const [x1, y1, x2, y2] = [v[0] ?? 0, v[1] ?? 0, v[2] ?? 3, v[3] ?? 4];
+            const dist = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            return `<strong>Distance AB:</strong> ${dist.toFixed(3)} units<br><strong>Midpoint:</strong> (${((x1 + x2) / 2).toFixed(2)}, ${((y1 + y2) / 2).toFixed(2)})`;
+          }
+        };
+      }
+      return {
+        fields: ['Value 1 (Length / a)', 'Value 2 (Breadth / b)', 'Area / Product (optional)', 'Perimeter / Sum (optional)'],
+        solve: (v) => {
+          let [l, b, A, P] = v;
+          if (!b && A && l) b = A / l;
+          if (!l && A && b) l = A / b;
+          if (!b && P && l) b = (P / 2) - l;
+          b = b || l;
+          if (!A && l && b) A = l * b;
+          if (!P && l && b) P = 2 * (l + b);
+          return `<strong>Input 1 (l/a):</strong> ${l ?? '?'} | <strong>Input 2 (b):</strong> ${b ?? '?'}<br>
+                  <strong>Area / Product:</strong> ${A ? A.toFixed(2) : '?'} | <strong>Perimeter:</strong> ${P ? P.toFixed(2) : '?'}<br>
+                  <strong>Sum (a+b):</strong> ${(l && b) ? (l + b) : '?'} | <strong>Difference |a−b|:</strong> ${(l && b) ? Math.abs(l - b) : '?'}`;
+        }
+      };
+    }
+
+    function getClassTopicCalculator(clsNum, topicName) {
+      const t = topicName.toLowerCase();
+      if (t.includes('counting') || t.includes('skip counting') || t.includes('even') || t.includes('odd') || t.includes('ordering') || t.includes('place value') || t.includes('knowing our numbers') || t.includes('whole numbers')) {
+        return {
+          fields: ['Start Number (n)', 'Step / Difference (d)', 'Count of Terms (k)'],
+          solve: (v) => {
+            const n = v[0] ?? 1, d = v[1] ?? (t.includes('even') || t.includes('odd') || t.includes('skip') ? 2 : 1), k = Math.min(12, Math.max(2, Math.round(v[2] || 5)));
+            const seq = Array.from({ length: k }, (_, idx) => n + idx * d);
+            const parity = Math.abs(n) % 2 === 0 ? 'Even' : 'Odd';
+            return `<strong>Sequence (${k} terms):</strong> ${seq.join(', ')}<br><strong>Start Parity:</strong> ${parity} | <strong>Next Term:</strong> ${n + k * d} | <strong>Sum of ${k} terms:</strong> ${((k / 2) * (2 * n + (k - 1) * d)).toFixed(1)}`;
+          }
+        };
+      }
+      if (t.includes('hcf') || t.includes('lcm') || t.includes('factors') || t.includes('multiples') || t.includes('prime') || t.includes('real numbers')) {
+        return {
+          fields: ['Number A', 'Number B'],
+          solve: (v) => {
+            const a = Math.abs(Math.round(v[0] ?? 12)), b = Math.abs(Math.round(v[1] ?? 18));
+            const gcd = (x, y) => !y ? x : gcd(y, x % y);
+            const hcf = gcd(a, b);
+            const lcm = hcf ? (a * b) / hcf : 0;
+            const isPrime = (num) => {
+              if (num < 2) return false;
+              for (let i = 2; i * i <= num; i++) if (num % i === 0) return false;
+              return true;
+            };
+            return `<strong>HCF(A, B):</strong> ${hcf} | <strong>LCM(A, B):</strong> ${lcm}<br><strong>Prime Check:</strong> A=${a} (${isPrime(a) ? 'Prime' : 'Composite/Other'}), B=${b} (${isPrime(b) ? 'Prime' : 'Composite/Other'})`;
+          }
+        };
+      }
+      if (t.includes('fraction') || t.includes('decimal') || t.includes('rational')) {
+        return {
+          fields: ['Numerator 1 / Dec 1', 'Denominator 1 (0 for Dec)', 'Numerator 2 / Dec 2', 'Denominator 2 (0 for Dec)'],
+          solve: (v) => {
+            const n1 = v[0] ?? 3, d1 = v[1] || 1, n2 = v[2] ?? 1, d2 = v[3] || 1;
+            const val1 = n1 / d1, val2 = n2 / d2;
+            return `<strong>Value 1:</strong> ${val1.toFixed(4)} (${(val1 * 100).toFixed(1)}%) | <strong>Value 2:</strong> ${val2.toFixed(4)}<br><strong>Sum:</strong> ${(val1 + val2).toFixed(4)} | <strong>Difference:</strong> ${(val1 - val2).toFixed(4)} | <strong>Product:</strong> ${(val1 * val2).toFixed(4)}`;
+          }
+        };
+      }
+      if (t.includes('percentage') || t.includes('ratio') || t.includes('proportion') || t.includes('profit') || t.includes('discount') || t.includes('average') || t.includes('mean')) {
+        return {
+          fields: ['Part / CP / Value 1', 'Total / SP / Value 2', 'Extra Value 3 (optional)'],
+          solve: (v) => {
+            const p = v[0] ?? 40, tVal = v[1] ?? 50, extra = v[2];
+            const pct = tVal ? (p / tVal) * 100 : 0;
+            const avg = extra !== null ? (p + tVal + extra) / 3 : (p + tVal) / 2;
+            const diff = tVal - p;
+            const plLabel = diff >= 0 ? `Gain/Diff = +${diff.toFixed(2)}` : `Loss/Diff = ${diff.toFixed(2)}`;
+            return `<strong>Percentage (1st of 2nd):</strong> ${pct.toFixed(2)}% | <strong>Ratio:</strong> ${p} : ${tVal}<br><strong>${plLabel}</strong> | <strong>Average:</strong> ${avg.toFixed(2)}`;
+          }
+        };
+      }
+      if (t.includes('equation') || t.includes('algebra') || t.includes('polynomial') || t.includes('quadratic') || t.includes('progression')) {
+        return getSolverSpec(topicName);
+      }
+      if (t.includes('square') || t.includes('cube') || t.includes('exponent') || t.includes('power')) {
+        return {
+          fields: ['Base (x)', 'Power / Index (n)'],
+          solve: (v) => {
+            const x = v[0] ?? 5, n = v[1] ?? 2;
+            return `<strong>x²:</strong> ${x * x} | <strong>√x:</strong> ${x >= 0 ? Math.sqrt(x).toFixed(4) : 'Complex'}<br><strong>x³:</strong> ${x * x * x} | <strong>∛x:</strong> ${Math.cbrt(x).toFixed(4)}<br><strong>xⁿ (${x}^${n}):</strong> ${Math.pow(x, n).toFixed(4)}`;
+          }
+        };
+      }
+      return getSolverSpec(topicName);
+    }
+
+    function renderTopicSolver() {
+      const isGeom = explorerMode === 'geometry';
+      const cls = document.getElementById('expClass').value;
+      const activeLabel = isGeom
+        ? document.getElementById('geomShapeSelect').value
+        : document.getElementById('expTopic').value;
+      const spec = isGeom ? getSolverSpec(activeLabel) : getClassTopicCalculator(Number(cls), activeLabel);
+      const svgHtml = getGeometrySVG(activeLabel);
+      const headingText = isGeom
+        ? `Geometry Property Solver — ${activeLabel}`
+        : `Class ${cls} Topic Calculator — ${activeLabel}`;
+
+      document.getElementById('solverPanel').innerHTML = `
+        <h4>${escapeHtml(headingText)}</h4>
+        <div class="solver-layout">
+          <div>
+            <div class="solver-grid">
+              ${spec.fields.map((f, i) => `
+                <div class="field-group">
+                  <label>${escapeHtml(f)}</label>
+                  <input type="number" step="any" id="sField_${i}" placeholder="Enter ${escapeHtml(f)}" />
+                </div>`).join('')}
+            </div>
+            <button class="btn" onclick="runTopicSolver()">⚡ Calculate All Properties</button>
+            <div id="solverOutput" class="result-box" style="display:none;"></div>
+          </div>
+          <div class="diagram-box">${svgHtml}</div>
+        </div>
+      `;
+    }
+
+    function runTopicSolver() {
+      const isGeom = explorerMode === 'geometry';
+      const cls = document.getElementById('expClass').value;
+      const activeLabel = isGeom
+        ? document.getElementById('geomShapeSelect').value
+        : document.getElementById('expTopic').value;
+      const spec = isGeom ? getSolverSpec(activeLabel) : getClassTopicCalculator(Number(cls), activeLabel);
+      const vals = spec.fields.map((_, i) => {
+        const raw = document.getElementById(`sField_${i}`).value;
+        return raw === '' ? null : parseFloat(raw);
+      });
+      const out = document.getElementById('solverOutput');
+      out.style.display = 'block';
+      out.innerHTML = spec.solve(vals);
+    }
+
+    /* ================= 7. ALL MATH FORMULAS BANK (STAGE + CLASS + TOPIC FILTERED) ================= */
+    const formulasBank = [
+      { classes: [1,2,3,4,5], topic: "Counting", title: "Place Value & Expanded Form", formula: "Number = (Hundreds × 100) + (Tens × 10) + Ones", desc: "Primary place value expansion" },
+      { classes: [1,2,3,4], topic: "Addition", title: "Addition & Zero Property", formula: "a + b = b + a  |  a + 0 = a", desc: "Commutative and Identity properties of addition" },
+      { classes: [1,2,3,4], topic: "Subtraction", title: "Subtraction & Difference Check", formula: "Minuend − Subtrahend = Difference", desc: "Difference + Subtrahend = Minuend" },
+      { classes: [2,3,4,5], topic: "Multiplication", title: "Multiplication & Division Check", formula: "Dividend = (Divisor × Quotient) + Remainder", desc: "Fundamental division verification rule" },
+      { classes: [3,4,5,6], topic: "Perimeter", title: "Rectangle & Square Perimeter/Area", formula: "Rect: Area = l × b, P = 2(l + b) | Sq: Area = a², P = 4a", desc: "Basic 2D mensuration formulas" },
+      { classes: [5,6,7], topic: "HCF", title: "HCF & LCM Relationship", formula: "HCF(a, b) × LCM(a, b) = a × b", desc: "Product of two numbers equals product of their HCF and LCM" },
+      { classes: [5,6,7,8], topic: "Percentage", title: "Percentage & Average", formula: "Percentage = (Value / Total) × 100 | Avg = Sum / Count", desc: "Core commercial arithmetic" },
+      { classes: [6,7,8], topic: "Simple Equations", title: "Linear Equation in One Variable", formula: "ax + b = c  ⇒  x = (c − b) / a", desc: "Transposing constants and coefficients" },
+      { classes: [7,8,9], topic: "Trapezium", title: "Trapezium Area & Perimeter", formula: "Area = ½ × (a + b) × h  |  P = a + b + c + d", desc: "a, b = parallel sides, h = perpendicular height" },
+      { classes: [7,8,9], topic: "Parallelogram", title: "Parallelogram & Rhombus", formula: "Parallelogram: b × h | Rhombus: ½ × d₁ × d₂", desc: "Opposite angles of a parallelogram are equal" },
+      { classes: [7,8], topic: "Profit", title: "Profit, Loss & Discount", formula: "Profit% = (Profit/CP)×100 | Discount = MP − SP", desc: "Commercial mathematics" },
+      { classes: [7,8], topic: "Interest", title: "Simple & Compound Interest", formula: "SI = (P×R×T)/100 | CI = P(1 + R/100)ᵀ − P", desc: "P = Principal, R = Rate, T = Time" },
+      { classes: [7,8,9,10], topic: "Pythagoras", title: "Pythagoras Theorem", formula: "Hypotenuse² = Base² + Perpendicular²", desc: "Right-angled triangle property" },
+      { classes: [8,9,10], topic: "Identities", title: "Algebraic Identities", formula: "(a+b)² = a²+2ab+b² | (a−b)² = a²−2ab+b² | a²−b² = (a+b)(a−b)", desc: "Standard polynomial expansions" },
+      { classes: [8,9,10], topic: "Mensuration", title: "3D Surface Areas & Volumes", formula: "Cube: a³ | Cuboid: lbh | Cyl: πr²h | Cone: ⅓πr²h | Sphere: (4/3)πr³", desc: "Solid geometry formulas" },
+      { classes: [9], topic: "Heron", title: "Heron’s Formula (Triangle Area)", formula: "Area = √[s(s−a)(s−b)(s−c)],  s = (a+b+c)/2", desc: "Area of triangle using three sides" },
+      { classes: [9,10], topic: "Coordinate", title: "Distance & Midpoint Formula", formula: "d = √[(x₂−x₁)² + (y₂−y₁)²] | Mid = ((x₁+x₂)/2, (y₁+y₂)/2)", desc: "Coordinate geometry" },
+      { classes: [10], topic: "Quadratic", title: "Quadratic Formula", formula: "x = [−b ± √(b² − 4ac)] / 2a", desc: "Roots of ax² + bx + c = 0" },
+      { classes: [10], topic: "Arithmetic Progression", title: "Arithmetic Progression (AP)", formula: "aₙ = a + (n−1)d  |  Sₙ = (n/2)[2a + (n−1)d]", desc: "nth term and sum of n terms" },
+      { classes: [10], topic: "Trigonometry", title: "Trigonometric Ratios & Identities", formula: "sin²θ + cos²θ = 1 | 1 + tan²θ = sec²θ | tanθ = sinθ/cosθ", desc: "Class 10 Trigonometry" },
+      { classes: [6,7,8,9,10], topic: "Circle", title: "Circle, Semicircle & Sector", formula: "Area = πr² | Circumference = 2πr | Sector = (θ/360)×πr²", desc: "Circle mensuration" }
+    ];
+
+    function handleStageChange() {
+      const stage = document.getElementById('formStage').value;
+      const clsSelect = document.getElementById('formClass');
+      let allowedClasses = [1,2,3,4,5,6,7,8,9,10];
+      if (stage === 'primary') allowedClasses = [1,2,3,4,5];
+      else if (stage === 'upper') allowedClasses = [6,7,8];
+      else if (stage === 'high') allowedClasses = [9,10];
+
+      clsSelect.innerHTML = allowedClasses.map(c => `<option value="${c}">Class ${c}</option>`).join('');
+      populateTopics('formClass', 'formTopic', true);
+      renderFormulas();
+    }
+
+    function renderFormulas() {
+      const stage = document.getElementById('formStage').value;
+      const cls = Number(document.getElementById('formClass').value);
+      const selectedTopic = document.getElementById('formTopic').value;
+      const searchQ = (document.getElementById('formulaSearch').value || '').toLowerCase();
+
+      const stageClasses = stage === 'primary' ? [1,2,3,4,5]
+        : stage === 'upper' ? [6,7,8]
+        : stage === 'high' ? [9,10]
+        : [1,2,3,4,5,6,7,8,9,10];
+
+      let filtered = formulasBank.filter(f => f.classes.includes(cls) && f.classes.some(c => stageClasses.includes(c)));
+      if (selectedTopic && selectedTopic !== 'All') {
+        const keyword = selectedTopic.split(' ')[0].toLowerCase();
+        const topicMatches = filtered.filter(f =>
+          f.topic.toLowerCase().includes(keyword) ||
+          f.title.toLowerCase().includes(keyword) ||
+          selectedTopic.toLowerCase().includes(f.topic.toLowerCase())
+        );
+        if (topicMatches.length > 0) filtered = topicMatches;
+      }
+      if (searchQ) {
+        filtered = filtered.filter(f =>
+          f.title.toLowerCase().includes(searchQ) ||
+          f.formula.toLowerCase().includes(searchQ) ||
+          f.desc.toLowerCase().includes(searchQ)
+        );
+      }
+
+      document.getElementById('formulaGrid').innerHTML = filtered.length
+        ? filtered.map(f => `<div class="card"><h3>${escapeHtml(f.title)}</h3><p style="font-weight:700;color:#0f172a;margin:6px 0;">${escapeHtml(f.formula)}</p><p>${escapeHtml(f.desc)}</p></div>`).join('')
+        : `<p style="color:var(--muted);">No exact formula card matched. Try selecting "All Class ${cls} Topics" or searching above.</p>`;
+    }
+
+    /* ================= 8. FREE GOOGLE GEMINI API + OFFLINE FALLBACK ================= */
+    function offlineMathEvaluator(query) {
+      const clean = query.trim();
+      if (/^[0-9+\-*/().%\s^]+$/.test(clean)) {
+        try {
+          const expr = clean.replace(/\^/g, '**');
+          const res = Function(`"use strict"; return (${expr})`)();
+          if (typeof res === 'number' && !isNaN(res)) {
+            return `<strong>🧮 Offline Math Solver Result:</strong><br>Expression: <code>${escapeHtml(clean)}</code><br>Answer = <strong>${res}</strong>`;
+          }
+        } catch (_) {}
+      }
+      const lower = clean.toLowerCase();
+      const matched = formulasBank.find(f => lower.includes(f.topic.toLowerCase()));
+      if (matched) {
+        return `<strong>📘 Formula (${escapeHtml(matched.title)}):</strong><br>${escapeHtml(matched.formula)}<br><em>${escapeHtml(matched.desc)}</em>`;
+      }
+      return `<strong>🤖 Aryabhat AI Offline Helper:</strong><br>No active Google Gemini API key detected.<br>• Type any calculation like <code>(45 * 12) / 5</code> to solve immediately.<br>• Or click the <strong>🔑</strong> icon at the top to enter your free Google Gemini API key for full web-grounded &amp; image answers!`;
+    }
+
+    async function callGemini(promptText, base64Img = null, mimeType = 'image/jpeg') {
+      if (!geminiApiKey) return offlineMathEvaluator(promptText);
+
+      const langInstruction = currentLang === 'or'
+        ? 'Respond in Odia (ଓଡ଼ିଆ) language.'
+        : currentLang === 'hi'
+          ? 'Respond in Hindi (हिन्दी) language.'
+          : 'Respond in clear English.';
+      const systemPrompt = `You are Aryabhat AI, an expert Class 1 to 10 mathematics tutor created by Govt. M.E. Wing, Mirganguda (Prayogshala), Guide Teacher: Kalu Charan Maharana. ${langInstruction} Provide clear step-by-step solutions:\n`;
+
+      const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+      for (const model of models) {
+        try {
+          const parts = [{ text: systemPrompt + promptText }];
+          if (base64Img) {
+            parts.push({ inline_data: { mime_type: mimeType, data: base64Img } });
+          }
+          const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(geminiApiKey)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts }] })
+          });
+          const data = await resp.json();
+          if (data.error) {
+            if (model === models[models.length - 1]) {
+              return `<strong>⚠️ Gemini API Error:</strong> ${escapeHtml(data.error.message)}<br><br>${offlineMathEvaluator(promptText)}`;
+            }
+            continue;
+          }
+          const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (replyText) {
+            return escapeHtml(replyText).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+          }
+        } catch (_) {
+          if (model === models[models.length - 1]) return offlineMathEvaluator(promptText);
+        }
+      }
+      return offlineMathEvaluator(promptText);
+    }
+
+    function toggleChat() {
+      const cw = document.getElementById('chatWindow');
+      cw.style.display = cw.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    async function sendChat() {
+      const inp = document.getElementById('chatInput');
+      const text = inp.value.trim();
+      if (!text) return;
+      const body = document.getElementById('chatBody');
+      body.innerHTML += `<div class="msg user">${escapeHtml(text)}</div>`;
+      inp.value = '';
+      const loadId = 'msg_' + Date.now();
+      body.innerHTML += `<div class="msg bot" id="${loadId}">⏳ Solving...</div>`;
+      body.scrollTop = body.scrollHeight;
+
+      const reply = await callGemini(text);
+      document.getElementById(loadId).innerHTML = reply;
+      body.scrollTop = body.scrollHeight;
+    }
+
+    let snapBase64 = null, snapMime = 'image/jpeg';
+    function previewSnap(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      snapMime = file.type || 'image/jpeg';
+      const reader = new FileReader();
+      reader.onload = () => {
+        snapBase64 = reader.result.split(',')[1];
+        document.getElementById('snapPreviewBox').innerHTML = `<img src="${reader.result}" alt="Math problem preview" style="max-width:260px;border-radius:10px;border:1px solid var(--border);" />`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function solveSnapImage() {
+      const cls = document.getElementById('snapClass').value;
+      const topic = document.getElementById('snapTopic').value;
+      const fallbackTxt = document.getElementById('snapTextFallback').value.trim();
+      const resBox = document.getElementById('snapResult');
+      resBox.style.display = 'block';
+      resBox.innerHTML = '⏳ Analyzing problem with Aryabhat AI...';
+
+      const query = fallbackTxt
+        ? `[Class ${cls} - ${topic}] ${fallbackTxt}`
+        : (snapBase64 ? `Solve the Class ${cls} (${topic}) math problem shown in this image step-by-step.` : 'Please upload a photo or type a math expression above.');
+      const answer = await callGemini(query, snapBase64, snapMime);
+      resBox.innerHTML = answer;
+    }
+
+    /* ================= INITIALIZE ALL MODULES ================= */
+    initClassDropdowns();
+    newDndQuestion();
+    renderTopicSolver();
+    renderFormulas();
+  </script>
+</body>
+</html>
