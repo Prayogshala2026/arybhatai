@@ -1515,6 +1515,55 @@
       }[ch]));
     }
 
+    function formatMathOutput(rawText) {
+      let text = String(rawText || '');
+
+      // Normalize common LaTeX math symbols and expressions before HTML escaping
+      text = text
+        .replace(/\$\$([\s\S]*?)\$\$/g, '\n$1\n')
+        .replace(/\$([^$\n]+?)\$/g, '$1')
+        .replace(/\\sqrt\{([^{}]+)\}/g, '√($1)')
+        .replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, '($1 / $2)')
+        .replace(/\\times/g, '×')
+        .replace(/\\div/g, '÷')
+        .replace(/\\cdot/g, '·')
+        .replace(/\\pm/g, '±')
+        .replace(/\\approx/g, '≈')
+        .replace(/\\neq/g, '≠')
+        .replace(/\\leq/g, '≤')
+        .replace(/\\geq/g, '≥')
+        .replace(/\\rightarrow|\\to/g, '→')
+        .replace(/\\Rightarrow/g, '⇒')
+        .replace(/\\pi/g, 'π')
+        .replace(/\\theta/g, 'θ')
+        .replace(/\\alpha/g, 'α')
+        .replace(/\\beta/g, 'β')
+        .replace(/\\gamma/g, 'γ')
+        .replace(/\\left|\\right/g, '')
+        .replace(/\\\(|\\\[|\\\]|\\\)/g, '');
+
+      // Convert superscripts and subscripts to clean Unicode/HTML
+      const supMap = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '+': '⁺', '-': '⁻' };
+      text = text.replace(/\^\{?([0-9+-]+)\}?/g, (_, exp) =>
+        exp.split('').map(ch => supMap[ch] || `<sup>${ch}</sup>`).join('')
+      );
+
+      // Clean Markdown headings, horizontal rules, and stray backslashes
+      text = text
+        .replace(/^#{1,6}\s*/gm, '')
+        .replace(/^\s*[-*_]{3,}\s*$/gm, '')
+        .replace(/\\([a-zA-Z]+)/g, '$1')
+        .replace(/\\/g, '');
+
+      // Escape HTML safely, then apply bold formatting and clean line breaks
+      let safe = escapeHtml(text)
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/(?:\r?\n){3,}/g, '<br><br>')
+        .replace(/\r?\n/g, '<br>');
+
+      return safe.trim();
+    }
+
     /* ================= DYNAMIC QUESTION GENERATOR BY CLASS & TOPIC ================= */
     function generateQuestionForTopic(cls, topic) {
       const c = Number(cls);
@@ -2325,7 +2374,7 @@
         : currentLang === 'hi'
           ? 'Respond in Hindi (हिन्दी) language.'
           : 'Respond in clear English.';
-      const systemPrompt = `You are Aryabhat AI, an expert Class 1 to 10 mathematics tutor created by Govt. M.E. Wing, Mirganguda (Prayogshala), Guide Teacher: Kalu Charan Maharana. ${langInstruction} Provide clear step-by-step solutions:\n`;
+      const systemPrompt = `You are Aryabhat AI, an expert Class 1 to 10 mathematics tutor created by Govt. M.E. Wing, Mirganguda (Prayogshala), Guide Teacher: Kalu Charan Maharana. ${langInstruction} Write clean, easy-to-read plain math without LaTeX dollar signs ($) or backslashes (\\). Use simple symbols like ×, ÷, √, ², and clear step-by-step lines:\n`;
 
       const models = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'];
       for (const model of models) {
@@ -2349,7 +2398,7 @@
           }
           const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text;
           if (replyText) {
-            return escapeHtml(replyText).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            return formatMathOutput(replyText);
           }
         } catch (_) {
           if (model === models[models.length - 1]) return offlineMathEvaluator(promptText);
