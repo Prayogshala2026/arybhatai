@@ -1494,7 +1494,7 @@
         drawer.style.display = 'block';
         input.value = geminiApiKey;
         status.innerText = geminiApiKey
-          ? '✅ Active: Free Google Gemini API Key configured.'
+          ? '✅ Active: Google Gemini API Key configured (using gemini-3.8-flash).'
           : 'ℹ️ Offline Math Mode active. Paste a Gemini API key to enable online AI.';
       }
     }
@@ -2297,7 +2297,7 @@
         : `<p style="color:var(--muted);">No exact formula card matched. Try selecting "All Class ${cls} Topics" or searching above.</p>`;
     }
 
-    /* ================= 8. FREE GOOGLE GEMINI API + OFFLINE FALLBACK ================= */
+    /* ================= 8. GOOGLE GEMINI API + OFFLINE FALLBACK ================= */
     function offlineMathEvaluator(query) {
       const clean = query.trim();
       if (/^[0-9+\-*/().%\s^]+$/.test(clean)) {
@@ -2314,7 +2314,7 @@
       if (matched) {
         return `<strong>📘 Formula (${escapeHtml(matched.title)}):</strong><br>${escapeHtml(matched.formula)}<br><em>${escapeHtml(matched.desc)}</em>`;
       }
-      return `<strong>🤖 Aryabhat AI Offline Helper:</strong><br>No active Google Gemini API key detected.<br>• Type any calculation like <code>(45 * 12) / 5</code> to solve immediately.<br>• Or click the <strong>🔑</strong> icon at the top to enter your free Google Gemini API key for full web-grounded &amp; image answers!`;
+      return `<strong>🤖 Aryabhat AI Offline Helper:</strong><br>No active Google Gemini API key detected.<br>• Type any calculation like <code>(45 * 12) / 5</code> to solve immediately.<br>• Or click the <strong>🔑</strong> icon at the top to enter your Google Gemini API key for full AI &amp; image answers!`;
     }
 
     async function callGemini(promptText, base64Img = null, mimeType = 'image/jpeg') {
@@ -2327,7 +2327,7 @@
           : 'Respond in clear English.';
       const systemPrompt = `You are Aryabhat AI, an expert Class 1 to 10 mathematics tutor created by Govt. M.E. Wing, Mirganguda (Prayogshala), Guide Teacher: Kalu Charan Maharana. ${langInstruction} Provide clear step-by-step solutions:\n`;
 
-      const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+      const models = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'];
       for (const model of models) {
         try {
           const parts = [{ text: systemPrompt + promptText }];
@@ -2341,8 +2341,9 @@
           });
           const data = await resp.json();
           if (data.error) {
+            const msg = data.error.message || 'Unknown API error';
             if (model === models[models.length - 1]) {
-              return `<strong>⚠️ Gemini API Error:</strong> ${escapeHtml(data.error.message)}<br><br>${offlineMathEvaluator(promptText)}`;
+              return `<strong>⚠️ Gemini API Error (${escapeHtml(model)}):</strong> ${escapeHtml(msg)}<br><br>${offlineMathEvaluator(promptText)}`;
             }
             continue;
           }
